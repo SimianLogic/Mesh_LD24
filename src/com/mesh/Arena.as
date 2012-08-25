@@ -1,0 +1,275 @@
+package com.mesh
+{
+	import flash.display.Sprite;
+	import flash.events.MouseEvent;
+	import flash.geom.ColorTransform;
+	
+	public class Arena extends Sprite implements IPixelController
+	{
+		//should these be passed in & make a dirty arena? not sure if i'll re-use them
+		public var boardColor:uint = 0x555555;
+		public var strokeColor:uint = 0x111111;
+		
+		private var _pixelWidth:int;
+		private var _pixelHeight:int;
+		private var _pixelSize:int;
+		private var _dirty:Boolean;
+		
+		public var pixels:Array;
+		public var meshes:Array;
+		public var collisionCheck:Array;
+		
+		public function get pixelWidth():int { return _pixelWidth; }
+		public function get pixelHeight():int { return _pixelHeight; }
+		public function get pixelSize():int { return _pixelSize; }
+		
+		
+		public function set pixelWidth(i:int):void
+		{
+			_pixelWidth = i;
+			_dirty = true;
+		}
+		public function set pixelHeight(i:int):void
+		{
+			_pixelHeight = i;
+			_dirty = true;
+		}
+		public function set pixelSize(i:int):void
+		{
+			_pixelSize = i;
+			_dirty = true;
+		}
+		
+		public function Arena(startPixelWidth:int, startPixelHeight:int, startPixelSize:int)
+		{
+			super();
+			
+			_pixelSize = startPixelSize;
+			
+			_pixelWidth = startPixelWidth;
+			_pixelHeight = startPixelHeight;
+			_dirty = true;
+			
+			draw();
+			
+			pixels = [];
+            meshes = [];
+            
+			collisionCheck = new Array(pixelWidth*pixelHeight);
+			resetCollisions();
+		}
+		
+		public function resetCollisions():void
+		{
+			for(var i:int = 0; i < collisionCheck.length; i++)
+			{
+				collisionCheck[i] ||= [];
+				if(collisionCheck[i].length > 0) collisionCheck[i] = [];
+			}
+		}
+		
+		public function addMesh(mesh:Mesh):void
+		{
+			meshes.push(mesh);
+            
+            var px:Array = mesh.pixels;
+            for each(var pixel:Pixel in px)
+            {
+                addPixel(pixel);
+            }
+		}
+		
+        public function transferPixel(pixel:Pixel, newController:IPixelController):void
+        {
+            removePixel(pixel);
+            newController.addPixel(pixel);
+        }
+		public function addPixel(pixel:Pixel):void
+		{
+			if(pixels.indexOf(pixel) == -1) pixels.push(pixel);
+			addChild(pixel);
+            
+            
+            //take control if they're a free pixel!
+            if(pixel.controller == null)
+            {
+                pixel.controller = this;
+                pixel.color = 0xffffff;
+                pixel.paint();
+            }
+		}
+		public function removePixel(pixel:Pixel):void
+		{
+			if(pixels.indexOf(pixel) >= 0)
+			{
+				pixels.splice(pixels.indexOf(pixel), 1);
+				removeChild(pixel);
+                pixel.cooldown = 0;
+                pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
+			}
+		}
+		
+		public function update(dt:int=0):void
+		{
+			resetCollisions();
+            
+            //go through our meshes and add any newly added pixels
+            for each(var mesh:Mesh in meshes)
+            {
+                var mesh_pixels:Array = mesh.pixels;
+                for each(var mp:Pixel in mesh_pixels)
+                {
+                    if(mp.parent != this)
+                    {
+                        addPixel(mp);
+                    }
+                }
+            }
+
+            for each(var pixel:Pixel in pixels)
+            {
+                pixel.paint();
+                
+                //figure out where the pixel is going
+                pixel.controller.updatePixel(pixel);
+                //put it there
+                updatePixelLocation(pixel);
+                
+                if(pixel.cooldown > 0)
+                {
+                    pixel.cooldown--;
+                    
+                    if(pixel.controller == this)
+                    {
+                        var pct:Number = 1.0 - Number(pixel.cooldown) / pixel.maxCooldown;
+                        pixel.transform.colorTransform = new ColorTransform(0,0,0,1,255,255*pct,255*pct,0);
+                    }
+                }
+                 
+                //store where it is in case anything else wants the same spot
+                collisionCheck[Math.round(pixel.px) + Math.round(pixel.py)*pixelWidth].push(pixel);
+            }
+			
+			resolveCollisions();
+		}
+        
+        public function updatePixel(pixel:Pixel):void
+        {
+            pixel.px += pixel.vx;
+            pixel.py += pixel.vy;
+            
+            if(pixel.px < 0)
+            {
+                pixel.px = 0;
+                pixel.vx = pixel.vx * -1;
+            }
+            
+            if(pixel.py < 0)
+            {
+                pixel.py = 0;
+                pixel.vy = pixel.vy*-1;
+            }
+            
+            if(pixel.px > pixelWidth - 1)
+            {
+                pixel.px = pixelWidth - 1;
+                pixel.vx = pixel.vx*-1;
+            }
+            
+            if(pixel.py > pixelHeight - 1)
+            {
+                pixel.py = pixelHeight - 1;
+                pixel.vy = pixel.vy*-1;
+            }
+            
+            updatePixelLocation(pixel);
+        }
+        
+        public function updatePixelLocation(pixel:Pixel):void
+        {
+            pixel.x = 1 + (pixelSize+1)*Math.round(pixel.px);
+            pixel.y = 1 + (pixelSize+1)*Math.round(pixel.py);
+        }
+        		
+		public function resolveCollisions():void
+		{
+			for(var i:int = 0; i < collisionCheck.length; i++)
+			{
+				if(collisionCheck[i].length > 1)
+				{
+                    //TODO: see if we're self-colliding once I add sub-meshes
+                    var j:int;
+                    
+                    //Possible Collison Results:
+                    //  1) two particles destroy each other (different meshes)
+                    //  2) a mesh particle absorbs a free particle
+                    //  3) free particles ignore each other (ditto for same base mesh)
+                    
+                    var toBeAbsorbed:Array = [];
+                    var wantsMAD:Array = [];   //mutually assured destruction!
+                    var MADFodder:Array = [];
+                    for each(var pixel:Pixel in collisionCheck[i])
+                    {
+                        
+                        if(pixel.controller == this)
+                        {
+                            toBeAbsorbed.push(pixel);
+                        }else{
+                            //add us to the MAD list if we're not in there already...
+                            if(wantsMAD.indexOf(pixel.controller) == -1)
+                            {
+                                MADFodder.push(pixel);
+                                wantsMAD.push(pixel.controller);
+                            }
+                        } 
+                    }
+                    
+                    trace("MAD: " + wantsMAD.length + "   TBA: " + toBeAbsorbed.length);
+                    if(wantsMAD.length == 1 && toBeAbsorbed.length > 0)
+                    {
+                        //mesh.absorbPixels
+                        for each(var absorbedPixel:Pixel in toBeAbsorbed)
+                        {
+                            transferPixel(absorbedPixel, wantsMAD[0]);
+                        }
+                    }
+                    
+                    //MUTUALLY ASSURED DESTRUCTION!
+                    if(wantsMAD.length >= 2)
+                    {
+                        //for now, simply destroy EVERYTHING... later could adapt it to do 1:1 pixel annihilation
+                        for each(var deadPixel:Pixel in MADFodder)
+                        {
+                            deadPixel.controller.transferPixel(deadPixel, this);
+                        }
+                    }
+                    
+				}
+			}
+		}
+		
+		public function draw():void
+		{
+			graphics.lineStyle(1, strokeColor);
+			graphics.beginFill(boardColor);
+				
+			var maxWidth:int = (pixelSize+1)*pixelWidth;
+			var maxHeight:int = (pixelSize+1)*pixelHeight;
+			
+			//add an extra pixel for every border line
+			graphics.drawRect(0,0,maxWidth,maxHeight);			
+			
+			var i:int;
+			for(i = 1; i < pixelWidth; i++)
+			{
+				graphics.moveTo((pixelSize+1)*i, 0);
+				graphics.lineTo((pixelSize+1)*i, maxHeight);
+			}
+			for(i = 1; i < pixelHeight; i++)
+			{
+				graphics.moveTo(0, (pixelSize+1)*i);
+				graphics.lineTo(maxWidth, (pixelSize+1)*i);
+			}
+		}
+	}
+}
