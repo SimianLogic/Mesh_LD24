@@ -30,7 +30,7 @@ package
             
             controller = Controller.getInstance(stage);
             Controller.registerAction("spin",32); //spacebar
-            
+            Controller.registerAction("spinLeft", 80);
 //            Controller.registerAction("pause", 80);
 //            Controller.registerAction("back", 27);
 			
@@ -77,11 +77,14 @@ package
             {
                 h++;
             }
+
+            var input:Array = Controller.getUpdates();
             
-            if(Controller.getUpdates()[0].indexOf("spin") >= 0)
-            {
-                player.spinRight();
-            }
+            if(Controller.isDown("spin")) player.spinRight();
+            if(Controller.isDown("spinLeft")) player.spinLeft();
+
+//            if(input[0].indexOf("spin") >= 0) player.spinRight();
+//            if(input[0].indexOf("spinLeft") >= 0) player.spinLeft();
             
             if(Math.abs(h) > 0 || Math.abs(v) > 0) player.move(h,v);
             

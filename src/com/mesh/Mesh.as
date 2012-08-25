@@ -43,6 +43,9 @@ package com.mesh
             addSlot(new PixelSlot(1, 0, 0x00ff00));
             addSlot(new PixelSlot(0, -1, 0x00ff00));
             addSlot(new PixelSlot(-1, 0, 0x00ff00));
+            //sword form!
+            addSlot(new PixelSlot(-2, 0, 0x00ff00));
+            addSlot(new PixelSlot(-3, 0, 0x00ff00));
 		}
         
         public function setBounds(newMinX:int, newMinY:int, newMaxX:int, newMaxY:int):void
@@ -51,6 +54,48 @@ package com.mesh
             minY = newMinY;
             maxX = newMaxX;
             maxY = newMaxY;
+        }
+        
+        //because we're pixel perfect, spinning only happens in 90-degree increments
+        public function spinLeft():void
+        {
+            rotation--;
+            if(rotation <= -4) rotation += 4;
+            
+            //x = -y, y = x
+            var swap:int;
+            for each(var pixelSlot:PixelSlot in pixelSlots)
+            {
+                swap = pixelSlot.px;
+                pixelSlot.px = pixelSlot.py;
+                pixelSlot.py = -1*swap;
+            }
+            
+            //could do this with a rotation as well, but until there's enough points to worry about this is easier
+            computeBounds();
+        }
+        public function spinRight():void
+        {
+            rotation++;
+            if(rotation >= 4) rotation -= 4;
+            
+            var swap:int;
+            for each(var pixelSlot:PixelSlot in pixelSlots)
+            {
+                swap = pixelSlot.px;
+                pixelSlot.px =-1*pixelSlot.py;
+                pixelSlot.py = swap;
+            }
+            
+            //could do this with a rotation as well, but until there's enough points to worry about this is easier
+            computeBounds();
+        }
+        public function resetSpin():void
+        {
+            while(rotation != 0)
+            {
+                spinRight();
+            }
         }
         
         public function slotForPixel(pixel:Pixel):PixelSlot
@@ -159,6 +204,11 @@ package com.mesh
             
             if(slot.pixel != null) slot.pixel.controller = null;
             
+           computeBounds();
+        }
+        
+        public function computeBounds():void
+        {
             left = 0;
             right = 0;
             top = 0;
@@ -170,7 +220,12 @@ package com.mesh
                 top = Math.min(ps.py, top);
                 bottom = Math.max(ps.py, bottom);
             }
-
+            
+            //scooch us back in if we were out
+            while(right + px  >= maxX) move(-1, 0);
+            while(px + left < 0) move(1,0);
+            while(top + py < 0) move(0,1);
+            while(py + bottom >= maxY) move(0,-1);
         }
         
 		public function get pixels():Array

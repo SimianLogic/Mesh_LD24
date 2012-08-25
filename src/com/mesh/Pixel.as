@@ -33,9 +33,6 @@ package com.mesh
 		
 		public function paint():void
 		{
-            if(color == 0x00ff00) trace("GREEN");
-            if(color == 0xffffff) trace("WHITE");
-
 			graphics.clear();
 			graphics.beginFill(color);
 			graphics.drawRect(0,0,pixelSize,pixelSize);
