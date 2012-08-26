@@ -282,7 +282,7 @@ package com.mesh
                         } 
                     }
                     
-                    trace("MAD: " + wantsMAD.length + "   TBA: " + toBeAbsorbed.length);
+                    if(wantsMAD.length) trace("MAD: " + wantsMAD.length + "   TBA: " + toBeAbsorbed.length);
                     //only absorb the pixels if we have a single absorber (MESH) which has a brain
                     if(wantsMAD.length == 1 && toBeAbsorbed.length > 0 && wantsMAD[0].hasBrain)
                     {

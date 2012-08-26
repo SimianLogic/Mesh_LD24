@@ -68,7 +68,7 @@ package
 //            player.setBounds(0,0,pixelWidth, pixelHeight);
 //            arena.addMesh(player);
             
-            var level1:MeshLevel = MeshLevel.parse(MeshLevel.LEVEL_1);
+            var level1:MeshLevel = MeshLevel.parse(MeshLevel.LEVEL_4);
             arena.play(level1, player);
             
 			/*

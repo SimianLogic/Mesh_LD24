@@ -27,13 +27,14 @@ package com.mesh
         public function update():void
         {
 			frame++;
-				
+            
             if(frame % frameDelay == 0 && actions.length > 1)
             {
                 actionIndex += actionDirection;
 				if(actionIndex == 0 && actionDirection == -1)
 				{
-					actionIndex = 1;
+                    trace("Go up!");
+					actionDirection = 1;
 				}
 				
                 if(actionIndex == actions.length - 1 && actionDirection == 1)
@@ -41,9 +42,11 @@ package com.mesh
                     if(actions[actions.length -1].action == "loop" && actions[actions.length -1].px == actions[0].px && actions[actions.length -1].py == actions[0].py)
                     {
                         //loops!
+                        trace("LOOP!");
                         actionIndex = 0;
                     }else{
                         //oscillate
+                        trace("Go down!");
                         actionDirection = -1                        
                     }
                 }

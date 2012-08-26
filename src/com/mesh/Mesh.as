@@ -166,10 +166,16 @@ package com.mesh
         {
             if(pixel.controller != this) throw new Error ("t'was not my pixel to transfer!");
 
+//            if(extraPixels > 0 && pixelSlots[0].pixel != pixel)
+//            {
+//                extraPixels--;
+//                return;
+//            }
+            
             //did we hit brain matter?
-            if(pixelSlots[0].pixel == pixel)
+            if(pixelSlots[0].pixel == pixel && hasBrain)
             {
-                _markedForDeath = true;
+                _markedForDeath = true;                
             }
             
             removePixel(pixel);
