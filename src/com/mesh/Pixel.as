@@ -12,13 +12,13 @@ package com.mesh
 		public var vy:Number;
 		
 		public var color:uint;
-		public var pixelSize:int;
+		public var pixelSize:int = 1; //gets overridden when added to a display
         public var cooldown:int; //frames of cooldown left
         public var maxCooldown:int; //total cooldown frames -- used to LERP the color
 		
 		public var controller:IPixelController;
 		
-		public function Pixel(size:int, _color:uint=0xffffff, _px:Number = 0, _py:Number = 0, _vx:Number = 0, _vy:Number = 0)
+		public function Pixel(_color:uint=0xffffff, _px:Number = 0, _py:Number = 0, _vx:Number = 0, _vy:Number = 0)
 		{
 
 			color = _color;
@@ -26,12 +26,11 @@ package com.mesh
 			py = _py;
 			vx = _vx;
 			vy = _vy;
-			pixelSize = size;
 			
-			paint();
+			draw();
 		}
 		
-		public function paint():void
+		public function draw():void
 		{
 			graphics.clear();
 			graphics.beginFill(color);

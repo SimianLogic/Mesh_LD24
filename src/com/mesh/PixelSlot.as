@@ -12,10 +12,10 @@ package com.mesh
 		public var px:int;
 		public var py:int;
 		
-		public function PixelSlot(startX:int, startY:int, startColor:uint, startPixel:Pixel=null)
+		public function PixelSlot(startX:int, startY:int, startColor:uint, startWithPixel:Boolean=false)
 		{
 			color = startColor;
-            if(startPixel) addPixel(startPixel);
+            if(startWithPixel) addPixel(new Pixel());
 			
 			px = startX;
 			py = startY;
@@ -29,7 +29,7 @@ package com.mesh
             
             pixel = newPixel;
             pixel.color = color;
-            pixel.paint();
+            pixel.draw();
         }
 	}
 }

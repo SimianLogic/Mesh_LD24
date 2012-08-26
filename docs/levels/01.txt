@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "title": "Level 1: Practice",
+  "pixelSize":24,
+  "pixelWidth":18,
+  "pixelHeight":18,
+  "startX": 9,
+  "startY": 16,
+  "meshes":[
+    {"x":9,"y":9, "brain":0, "slots":[
+      {"x":0,"y":0,"c":"g","filled":1},
+      {"x":0,"y":1,"c":"g","filled":1},
+      {"x":0,"y":2,"c":"g","filled":1},
+      {"x":2,"y":0,"c":"g","filled":1},
+      {"x":1,"y":0,"c":"g","filled":1},
+      {"x":-2,"y":0,"c":"g","filled":1},
+      {"x":-1,"y":0,"c":"g","filled":1},
+      {"x":0,"y":-1,"c":"g","filled":1},
+      {"x":0,"y":-2,"c":"g","filled":1}
+    ]}
+  ]
+}

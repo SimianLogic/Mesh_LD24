@@ -1,6 +1,7 @@
 package com.mesh
 {
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
 	
@@ -58,6 +59,35 @@ package com.mesh
 			collisionCheck = new Array(pixelWidth*pixelHeight);
 			resetCollisions();
 		}
+        
+        public function play(level:MeshLevel, player:Mesh):void
+        {          
+            pixelSize = level.pixelSize;
+            pixelWidth = level.pixelWidth;
+            pixelHeight = level.pixelHeight;
+            
+            player.reset(5); //keep your first 5 pixelSlots only!
+            player.px = level.startX;
+            player.py = level.startY;
+            player.setBounds(0,0,pixelWidth, pixelHeight);
+            
+            //the update loop will add the pixels for us 
+            meshes = level.meshes;
+            
+            addMesh(player);
+            
+            
+            //TODO: initialize UI, show a splash screen?
+            var titleCard:LevelIntro = new LevelIntro();
+            titleCard.tf.text = "level " + level.id + "\n" + level.title;
+            
+            stage.addChild(titleCard);
+            stage.addEventListener("controller:space", function(event:Event=null):void {
+                stage.removeChild(titleCard);
+                titleCard = null;
+                event.currentTarget.removeEventListener(event.type, arguments.callee);
+            }, false, 0, true);
+        }
 		
 		public function resetCollisions():void
 		{
@@ -110,14 +140,19 @@ package com.mesh
 			if(pixels.indexOf(pixel) == -1) pixels.push(pixel);
 			addChild(pixel);
             
-            
             //take control if they're a free pixel!
             if(pixel.controller == null)
             {
                 pixel.controller = this;
                 pixel.color = 0xffffff;
-                pixel.paint();
             }
+            
+            if(pixel.pixelSize != pixelSize)
+            {
+                pixel.pixelSize = pixelSize;
+            }
+            
+            pixel.draw();
 		}
 		public function removePixel(pixel:Pixel):void
 		{
@@ -150,7 +185,8 @@ package com.mesh
 
             for each(var pixel:Pixel in pixels)
             {
-                pixel.paint();
+                //probably shouldn't do this every frame...
+                //pixel.draw();
                 
                 //figure out where the pixel is going
                 pixel.controller.updatePixel(pixel);
@@ -247,7 +283,8 @@ package com.mesh
                     }
                     
                     trace("MAD: " + wantsMAD.length + "   TBA: " + toBeAbsorbed.length);
-                    if(wantsMAD.length == 1 && toBeAbsorbed.length > 0)
+                    //only absorb the pixels if we have a single absorber (MESH) which has a brain
+                    if(wantsMAD.length == 1 && toBeAbsorbed.length > 0 && wantsMAD[0].hasBrain)
                     {
                         //mesh.absorbPixels
                         for each(var absorbedPixel:Pixel in toBeAbsorbed)

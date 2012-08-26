@@ -1,11 +1,10 @@
 package com.mesh
 {
+    //Mesh is just a data container--it has no knowledge of pixel sizes... it's pixels will get
+    //sized propery when they're added to an arena.
 	
 	public class Mesh implements IPixelController
 	{
-		//public var controller
-		
-		public var pixelSize:int;
 		
 		//the first pixelSlot is always the root pixel
 		public var pixelSlots:Array;
@@ -27,30 +26,42 @@ package com.mesh
         public var top:int;
         public var bottom:int;
         
-        public var markedForDeath:Boolean = false;
+        private var _markedForDeath:Boolean = false;
+        public var hasBrain:Boolean = true;
+        public function get markedForDeath():Boolean{ return (_markedForDeath && hasBrain); }
 		
 		public var path:Path;
 		
-		public function Mesh(startPixelSize:int, startX:int=0, startY:int=0) 
+		public function Mesh() 
 		{
 			super();
-            
-            px = startX;
-            py = startY;
-			
-			pixelSize = startPixelSize;
 			
 			pixelSlots = [];
-            
-            addSlot(new PixelSlot(0, 0, 0x0000ff, new Pixel(pixelSize)));
-            addSlot(new PixelSlot(0, 1, 0x00ff00, new Pixel(pixelSize)));
-            addSlot(new PixelSlot(1, 0, 0x00ff00));
-            addSlot(new PixelSlot(0, -1, 0x00ff00));
-            addSlot(new PixelSlot(-1, 0, 0x00ff00));
-            //sword form!
-            addSlot(new PixelSlot(-2, 0, 0x00ff00));
-            addSlot(new PixelSlot(-3, 0, 0x00ff00));
+
 		}
+        
+        public function reset(keepers:int):void
+        {
+            var i:int = 0;
+            for each(var pixelSlot:PixelSlot in pixelSlots)
+            {
+                if(i < keepers)
+                {
+                    if(pixelSlot.pixel == null)
+                    {
+                        var pixel:Pixel = new Pixel();
+                        pixel.controller = this;
+                        pixelSlot.addPixel(pixel);
+                    }
+                }else{
+                    if(pixelSlot.pixel != null)
+                    {
+                        pixelSlot.pixel.controller = null;
+                        pixelSlot.pixel = null;
+                    }
+                }
+            }
+        }
 		
 		public function update():void
 		{
@@ -135,7 +146,6 @@ package com.mesh
 			
 			if(path != null)
 			{
-				trace("GOT A PATH  " + path.px + "," + path.py);
 				pixel.px += path.px;
 				pixel.py += path.py;
 			}
@@ -159,7 +169,7 @@ package com.mesh
             //did we hit brain matter?
             if(pixelSlots[0].pixel == pixel)
             {
-                markedForDeath = true;
+                _markedForDeath = true;
             }
             
             removePixel(pixel);

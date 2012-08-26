@@ -11,8 +11,8 @@ package com.mesh
     
     import flash.display.*;
     import flash.events.*;
-    import flash.utils.*;
     import flash.ui.*;
+    import flash.utils.*;
     
     public class Controller
     {
@@ -130,6 +130,18 @@ package com.mesh
             return [keysdown, keysup];
         }
         
+        /**** EVENT EMULATION ***/
+        //idea is to let us us do cool stuff like Controler.addTrigger("jump", jumpHandler);
+        
+        public static function addTrigger(action:String, handler:Function):void
+        {
+            game.addEventListener("controller:" + action, handler);    
+        }
+        
+        public static function removeTrigger(action:String, handler:Function):void
+        {
+            game.removeEventListener("controller:" + action, handler);
+        }
         
         /**** HANDLE INPUT *****/
         public function keyUp(e:KeyboardEvent):void
@@ -155,6 +167,7 @@ package com.mesh
                     {
                         actionStates[i] = true;
                         downTimes[i] = getTimer();
+                        game.dispatchEvent(new Event("controller:" + actionNames[i]));
                     }
                 }
             }      
