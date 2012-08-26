@@ -1,6 +1,6 @@
 {
   "id": 1,
-  "title": "Level 1: Practice",
+  "title": "introduction",
   "pixelSize":24,
   "pixelWidth":18,
   "pixelHeight":18,

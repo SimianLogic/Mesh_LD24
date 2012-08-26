@@ -1,6 +1,6 @@
 {
-  "id": 2,
-  "title": "more pixels",
+  "id": 4,
+  "title": "moving targets",
   "pixelSize":24,
   "pixelWidth":18,
   "pixelHeight":18,
@@ -32,6 +32,38 @@
       {"x":0,"y":8,"c":"g","filled":1},
       {"x":0,"y":9,"c":"g","filled":1},
       {"x":0,"y":10,"c":"g","filled":1}
-    ]}
+    ]},
+    {"x":7,"y":8, "slots":[
+      {"x":0,"y":0,"c":"b","filled":1},
+      {"x":-1,"y":0,"c":"g","filled":1},
+      {"x":0,"y":1,"c":"g","filled":1},
+      {"x":0,"y":-1,"c":"g","filled":1}
+    ], "path":{
+      "frameDelay":4,
+      "actions":[
+        {"x":0,"y":0,"action":"wait"},
+        {"x":0,"y":1,"action":"move"},
+        {"x":0,"y":2,"action":"move"},
+        {"x":0,"y":3,"action":"move"},
+        {"x":0,"y":4,"action":"move"},
+        {"x":0,"y":5,"action":"move"}
+      ]}
+    },
+    {"x":11,"y":8, "slots":[
+      {"x":0,"y":0,"c":"b","filled":1},
+      {"x":1,"y":0,"c":"g","filled":1},
+      {"x":0,"y":1,"c":"g","filled":1},
+      {"x":0,"y":-1,"c":"g","filled":1}
+    ], "path":{
+      "frameDelay":4,
+      "actions":[
+        {"x":0,"y":0,"action":"wait"},
+        {"x":0,"y":-1,"action":"move"},
+        {"x":0,"y":-2,"action":"move"},
+        {"x":0,"y":-3,"action":"move"},
+        {"x":0,"y":-4,"action":"move"},
+        {"x":0,"y":-5,"action":"move"}
+      ]}
+    }
   ]
 }

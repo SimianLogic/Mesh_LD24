@@ -1,0 +1,32 @@
+{
+  "id": 3,
+  "title": "brain food",
+  "pixelSize":24,
+  "pixelWidth":18,
+  "pixelHeight":18,
+  "startX": 9,
+  "startY": 16,
+  "meshes":[
+    {"x":9,"y":9,"slots":[
+      {"x":0,"y":0,"c":"g","filled":1},
+      {"x":0,"y":-1,"c":"b","filled":1},
+      {"x":0,"y":-2,"c":"b","filled":1},      
+      {"x":0,"y":-3,"c":"b","filled":1},
+      {"x":0,"y":-4,"c":"b","filled":1},
+      {"x":1,"y":-3,"c":"b","filled":1},
+      {"x":-1,"y":-3,"c":"b","filled":1},
+      {"x":-2,"y":-3,"c":"b","filled":1},
+      {"x":2,"y":-3,"c":"b","filled":1},
+      {"x":-3,"y":-3,"c":"b","filled":1},
+      {"x":3,"y":-3,"c":"b","filled":1},
+      {"x":-3,"y":-2,"c":"b","filled":1},
+      {"x":3,"y":-2,"c":"b","filled":1},
+      {"x":-3,"y":-1,"c":"b","filled":1},
+      {"x":3,"y":-1,"c":"b","filled":1},
+      {"x":-3,"y":0,"c":"b","filled":1},
+      {"x":3,"y":0,"c":"b","filled":1},
+      {"x":-3,"y":1,"c":"b","filled":1},
+      {"x":3,"y":1,"c":"b","filled":1}
+    ]}
+  ]
+}
