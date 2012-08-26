@@ -29,6 +29,10 @@ package com.mesh
             
             pixel = newPixel;
             pixel.color = color;
+            pixel.vx = 0;
+            pixel.vy = 0;
+            pixel.px = 0;
+            pixel.py = 0;
             pixel.draw();
         }
 	}

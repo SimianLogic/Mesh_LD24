@@ -42,11 +42,12 @@ package
             controller = Controller.getInstance(stage);
             
             Controller.registerAction("space",32);
+            Controller.registerAction("esc", 27);
             
 //            Controller.registerAction("spin",32); //spacebar
 //            Controller.registerAction("spinLeft", 80);
 //            Controller.registerAction("pause", 80);
-//            Controller.registerAction("back", 27);
+
 			
 			arena = new Arena(pixelWidth, pixelHeight, pixelSize);
 			addChild(arena);
@@ -55,11 +56,11 @@ package
             
             player = new Mesh();
             
-            player.addSlot(new PixelSlot(0, 0, 0x0000ff, true));
-            player.addSlot(new PixelSlot(0, 1, 0x00ff00, true));
-            player.addSlot(new PixelSlot(1, 0, 0x00ff00, true));
-            player.addSlot(new PixelSlot(0, -1, 0x00ff00, true));
-            player.addSlot(new PixelSlot(-1, 0, 0x00ff00, true));
+            player.addSlot(new PixelSlot(0, 0, 0x00ff00, true));
+            player.addSlot(new PixelSlot(0, 1, 0x0000ff, true));
+            player.addSlot(new PixelSlot(1, 0, 0x0000ff, true));
+            player.addSlot(new PixelSlot(0, -1, 0x0000ff, true));
+            player.addSlot(new PixelSlot(-1, 0, 0x0000ff, true));
             //sword form!
 //            addSlot(new PixelSlot(-2, 0, 0x00ff00));
 //            addSlot(new PixelSlot(-3, 0, 0x00ff00));
@@ -68,7 +69,7 @@ package
 //            player.setBounds(0,0,pixelWidth, pixelHeight);
 //            arena.addMesh(player);
             
-            var level1:MeshLevel = MeshLevel.parse(MeshLevel.LEVEL_4);
+            var level1:MeshLevel = MeshLevel.parse(MeshLevel.LEVEL_3);
             arena.play(level1, player);
             
 			/*

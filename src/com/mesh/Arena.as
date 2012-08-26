@@ -1,9 +1,11 @@
 package com.mesh
 {
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
+	import flash.utils.setTimeout;
 	
 	public class Arena extends Sprite implements IPixelController
 	{
@@ -60,8 +62,26 @@ package com.mesh
 			resetCollisions();
 		}
         
+        public function empty():void
+        {
+            for(var i:int = 0; i < pixels.length; i++)
+            {
+                pixels[i].controller = null;
+                removeChild(pixels[i]);
+            }
+            meshes = [];
+            pixels = [];
+        }
+        
+        public var currentLevel:MeshLevel;
+        public var currentPlayer:Mesh;
         public function play(level:MeshLevel, player:Mesh):void
         {          
+            currentLevel = level;
+            currentPlayer = player;
+            
+            empty();
+            
             pixelSize = level.pixelSize;
             pixelWidth = level.pixelWidth;
             pixelHeight = level.pixelHeight;
@@ -87,6 +107,11 @@ package com.mesh
                 titleCard = null;
                 event.currentTarget.removeEventListener(event.type, arguments.callee);
             }, false, 0, true);
+        }
+        
+        public function restart():void
+        {
+            play(currentLevel, currentPlayer);
         }
 		
 		public function resetCollisions():void
@@ -127,6 +152,7 @@ package com.mesh
                 pixel.cooldown = MeshGame.PIXEL_COOLDOWN;
                 pixel.maxCooldown = MeshGame.PIXEL_COOLDOWN;
             }
+            mesh.clear();
             
         }
 		
@@ -162,7 +188,9 @@ package com.mesh
 				removeChild(pixel);
                 pixel.cooldown = 0;
                 pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
-			}
+			}else{
+                trace("BAD PIXEL!");
+            }
 		}
 		
 		public function update(dt:int=0):void
@@ -307,6 +335,11 @@ package com.mesh
                             if(maybeDeadMesh.markedForDeath)
                             {
                                 removeMesh(maybeDeadMesh);
+                                if(maybeDeadMesh == currentPlayer)
+                                {
+                                    //let the cooldown play, then let us start over
+                                    setTimeout(showGameOver, MeshGame.PIXEL_COOLDOWN * 17);
+                                }
                             }
                         }
                     }
@@ -314,6 +347,32 @@ package com.mesh
 				}
 			}
 		}
+        
+        public var escapePopup:MovieClip;
+        public function showGameOver():void
+        {
+            escapePopup ||= new GameOver();
+            
+            stage.addChild(escapePopup);
+            stage.addEventListener("controller:space", resetHandler, false, 0, true);
+            stage.addEventListener("controller:esc", menuHandler, false, 0, true);
+        }
+        
+        public function resetHandler(event:Event):void
+        {
+            stage.removeChild(escapePopup);
+            stage.removeEventListener("controller:space", resetHandler);
+            stage.removeEventListener("controller:esc", menuHandler);
+            restart();
+        }
+        public function menuHandler(event:Event):void
+        {
+            stage.removeChild(escapePopup);
+            stage.removeEventListener("controller:space", resetHandler);
+            stage.removeEventListener("controller:esc", menuHandler);
+            empty();
+            trace("TODO: menu?");
+        }
 		
 		public function draw():void
 		{

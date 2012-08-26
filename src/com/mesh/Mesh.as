@@ -40,6 +40,14 @@ package com.mesh
 
 		}
         
+        public function clear():void
+        {
+            for each(var pixelSlot:PixelSlot in pixelSlots)
+            {
+                pixelSlot.pixel = null;
+            }
+        }
+        
         public function reset(keepers:int):void
         {
             var i:int = 0;
@@ -60,6 +68,7 @@ package com.mesh
                         pixelSlot.pixel = null;
                     }
                 }
+                i++;
             }
         }
 		
