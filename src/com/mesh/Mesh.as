@@ -50,6 +50,7 @@ package com.mesh
         
         public function reset(keepers:int):void
         {
+            _markedForDeath = false;
             var i:int = 0;
             for each(var pixelSlot:PixelSlot in pixelSlots)
             {

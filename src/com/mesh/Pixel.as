@@ -29,6 +29,12 @@ package com.mesh
 			
 			draw();
 		}
+        
+        public function round():void
+        {
+            px = Math.round(px);
+            py = Math.round(py);
+        }
 		
 		public function draw():void
 		{

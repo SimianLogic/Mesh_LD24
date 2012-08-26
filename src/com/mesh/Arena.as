@@ -19,6 +19,7 @@ package com.mesh
 		private var _dirty:Boolean;
 		
 		public var pixels:Array;
+        public var implode:Boolean = false;
 		public var meshes:Array;
 		public var collisionCheck:Array;
 		
@@ -76,7 +77,9 @@ package com.mesh
         public var currentLevel:MeshLevel;
         public var currentPlayer:Mesh;
         public function play(level:MeshLevel, player:Mesh):void
-        {          
+        {   
+            implode = false;
+            
             currentLevel = level;
             currentPlayer = player;
             
@@ -211,32 +214,48 @@ package com.mesh
 				mesh.update();
             }
 
+            trace("PIXELS: " + pixels.length);
             for each(var pixel:Pixel in pixels)
             {
-                //probably shouldn't do this every frame...
-                //pixel.draw();
+                if(implode && pixel.controller == this)
+                {
+                    pixel.cooldown = 0;
+                    pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
+                    pixel.round();
+                    if(pixel.px > currentPlayer.px) pixel.px--;
+                    if(pixel.py > currentPlayer.py) pixel.py--;
+                    if(pixel.px < currentPlayer.px) pixel.px++;
+                    if(pixel.py < currentPlayer.py) pixel.py++;
+                    
+                }else{
                 
-                //figure out where the pixel is going
-                pixel.controller.updatePixel(pixel);
-                //put it there
+                    //figure out where the pixel is going
+                    pixel.controller.updatePixel(pixel);
+                    
+                    if(pixel.cooldown > 0)
+                    {
+                        pixel.cooldown--;
+                        
+                        if(pixel.controller == this)
+                        {
+                            var pct:Number = 1.0 - Number(pixel.cooldown) / pixel.maxCooldown;
+                            pixel.transform.colorTransform = new ColorTransform(0,0,0,1,255,255*pct,255*pct,0);
+                        }
+                    }
+                }   
+                
                 updatePixelLocation(pixel);
                 
-                if(pixel.cooldown > 0)
-                {
-                    pixel.cooldown--;
-                    
-                    if(pixel.controller == this)
-                    {
-                        var pct:Number = 1.0 - Number(pixel.cooldown) / pixel.maxCooldown;
-                        pixel.transform.colorTransform = new ColorTransform(0,0,0,1,255,255*pct,255*pct,0);
-                    }
-                }
-                 
                 //store where it is in case anything else wants the same spot
-                collisionCheck[Math.round(pixel.px) + Math.round(pixel.py)*pixelWidth].push(pixel);
+                collisionCheck[Math.round(pixel.px) + Math.round(pixel.py)*pixelWidth].push(pixel);                   
             }
-			
+            
 			resolveCollisions();
+            
+            if(pixels.length == currentPlayer.pixels.length)
+            {
+                setTimeout(showVictory, 250);       
+            }
 		}
         
         public function updatePixel(pixel:Pixel):void
@@ -268,7 +287,6 @@ package com.mesh
                 pixel.vy = pixel.vy*-1;
             }
             
-            updatePixelLocation(pixel);
         }
         
         public function updatePixelLocation(pixel:Pixel):void
@@ -342,6 +360,12 @@ package com.mesh
                                 }
                             }
                         }
+                        
+                        if(meshes.length == 1 && meshes[0] == currentPlayer)
+                        {
+                            trace("YOU WIN!");
+                            setTimeout(function():void{ implode = true; }, MeshGame.PIXEL_COOLDOWN * 17);
+                        }
                     }
                     
 				}
@@ -373,6 +397,33 @@ package com.mesh
             empty();
             trace("TODO: menu?");
         }
+        
+        public var winPopup:MovieClip;
+        public function showVictory():void
+        {
+            winPopup ||= new YouWin();
+            
+            stage.addChild(winPopup);
+            stage.addEventListener("controller:space", nextHandler, false, 0, true);
+            stage.addEventListener("controller:esc", winMenuHandler, false, 0, true);
+        }
+        
+        public function nextHandler(event:Event):void
+        {
+            stage.removeChild(winPopup);
+            stage.removeEventListener("controller:space", nextHandler);
+            stage.removeEventListener("controller:esc", winMenuHandler);
+            dispatchEvent(new Event("nextLevel"));
+        }
+        public function winMenuHandler(event:Event):void
+        {
+            stage.removeChild(winPopup);
+            stage.removeEventListener("controller:space", nextHandler);
+            stage.removeEventListener("controller:esc", winMenuHandler);
+            empty();
+            trace("TODO: menu?");
+        }
+        
 		
 		public function draw():void
 		{

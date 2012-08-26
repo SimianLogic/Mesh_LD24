@@ -26,8 +26,13 @@ package
         public static var PIXEL_SPEED:Number = 0.25;
         public static var PIXEL_COOLDOWN:int = 60;
         
+        public var currentLevel:int = 0;
+        public var levels:Array;
+        
 		public function MeshGame()
 		{
+            levels = [MeshLevel.LEVEL_1, MeshLevel.LEVEL_2,MeshLevel.LEVEL_3, MeshLevel.LEVEL_4];
+            
 //			var pixelWidth:int = 64;
 //			var pixelHeight:int = 48;
 //			var pixelSize:int = 9;
@@ -54,6 +59,8 @@ package
             arena.x = 15;
             arena.y = 15;
             
+            arena.addEventListener("nextLevel", nextLevelHandler);
+            
             player = new Mesh();
             
             player.addSlot(new PixelSlot(0, 0, 0x00ff00, true));
@@ -69,46 +76,18 @@ package
 //            player.setBounds(0,0,pixelWidth, pixelHeight);
 //            arena.addMesh(player);
             
-            var level1:MeshLevel = MeshLevel.parse(MeshLevel.LEVEL_3);
+            var level1:MeshLevel = MeshLevel.parse(MeshLevel.LEVEL_1);
             arena.play(level1, player);
-            
-			/*
-			for(var i:int = 0; i < 25; i++)
-			{
-				var angle:Number = Math.random()*2*Math.PI;
-				var p:Pixel = new Pixel(0xffffff, Math.floor(Math.random()*pixelWidth), Math.floor(Math.random()*pixelHeight),Math.cos(angle)*PIXEL_SPEED, Math.sin(angle)*PIXEL_SPEED); 
-				
-				arena.addPixel(p);
-			}
-			
-            enemy = new Mesh(pixelSize, 12, 12);
-            enemy.setBounds(0,0,pixelWidth, pixelHeight);
-            arena.addMesh(enemy);
-			
-			var path:Path = new Path();
-			path.frameDelay = 3;
-			path.actions.push(new PathAction(0,1,PathAction.MOVE));
-			path.actions.push(new PathAction(0,2,PathAction.MOVE));
-			path.actions.push(new PathAction(0,3,PathAction.MOVE));
-			path.actions.push(new PathAction(0,4,PathAction.MOVE));
-			path.actions.push(new PathAction(-1,4,PathAction.MOVE));
-			path.actions.push(new PathAction(-2,4,PathAction.MOVE));
-			path.actions.push(new PathAction(-3,4,PathAction.MOVE));
-			path.actions.push(new PathAction(-4,4,PathAction.MOVE));
-			path.actions.push(new PathAction(-4,3,PathAction.MOVE));
-			path.actions.push(new PathAction(-4,2,PathAction.MOVE));
-			path.actions.push(new PathAction(-4,1,PathAction.MOVE));
-			path.actions.push(new PathAction(-4,0,PathAction.MOVE));
-			path.actions.push(new PathAction(-4,0,PathAction.MOVE));
-			path.actions.push(new PathAction(-3,0,PathAction.MOVE));
-			path.actions.push(new PathAction(-2,0,PathAction.MOVE));
-			path.actions.push(new PathAction(-1,0,PathAction.MOVE));
-			path.actions.push(new PathAction(0,0,PathAction.LOOP));
-			enemy.path = path;
-            */
             
 			this.addEventListener(Event.ENTER_FRAME, update);	
 		}
+        
+        public function nextLevelHandler(e:Event=null):void
+        {
+            currentLevel++;
+            if(currentLevel >= levels.length) currentLevel = 0;
+            arena.play(MeshLevel.parse(levels[currentLevel]), player);
+        }
 		
         private var osc:int = 0;
         private var oscDir:int = 1;

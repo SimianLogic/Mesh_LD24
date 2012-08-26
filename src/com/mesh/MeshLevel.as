@@ -94,7 +94,7 @@ package com.mesh
                     {
                         actions.push(new PathAction(action["x"], action["y"], action["action"]));                    
                     }
-                    var path = new Path();
+                    var path:Path = new Path();
                     path.actions = actions;
                     path.frameDelay = obj["path"]["frameDelay"];
                     mesh.path = path;
