@@ -26,6 +26,10 @@ package com.mesh
         public var right:int;
         public var top:int;
         public var bottom:int;
+        
+        public var markedForDeath:Boolean = false;
+		
+		public var path:Path;
 		
 		public function Mesh(startPixelSize:int, startX:int=0, startY:int=0) 
 		{
@@ -46,6 +50,15 @@ package com.mesh
             //sword form!
             addSlot(new PixelSlot(-2, 0, 0x00ff00));
             addSlot(new PixelSlot(-3, 0, 0x00ff00));
+		}
+		
+		public function update():void
+		{
+			if(path == null) return;
+			
+			path.update();
+			if(path.currentAction.action == PathAction.SPIN_LEFT) spinLeft();
+			if(path.currentAction.action == PathAction.SPIN_RIGHT) spinRight();
 		}
         
         public function setBounds(newMinX:int, newMinY:int, newMaxX:int, newMaxY:int):void
@@ -119,6 +132,13 @@ package com.mesh
                 pixel.px = this.px + pixelSlot.px;
                 pixel.py = this.py + pixelSlot.py;
             }
+			
+			if(path != null)
+			{
+				trace("GOT A PATH  " + path.px + "," + path.py);
+				pixel.px += path.px;
+				pixel.py += path.py;
+			}
         }
         
         public function move(dx:int, dy:int):void
@@ -135,6 +155,13 @@ package com.mesh
         public function transferPixel(pixel:Pixel, newController:IPixelController):void
         {
             if(pixel.controller != this) throw new Error ("t'was not my pixel to transfer!");
+
+            //did we hit brain matter?
+            if(pixelSlots[0].pixel == pixel)
+            {
+                markedForDeath = true;
+            }
+            
             removePixel(pixel);
             newController.addPixel(pixel);
             

@@ -78,6 +78,27 @@ package com.mesh
                 addPixel(pixel);
             }
 		}
+        
+        public function removeMesh(mesh:Mesh):void
+        {
+            if(meshes.indexOf(mesh) >= 0)
+            {
+                meshes.splice(meshes.indexOf(mesh), 1);    
+            }
+            var px:Array = mesh.pixels;
+            for each(var pixel:Pixel in px)
+            {
+                pixel.controller = this;
+                
+                var dir:Number = Math.random()*2*Math.PI;
+                //kind of a gross dependency
+                pixel.vx = Math.cos(dir)*MeshGame.PIXEL_SPEED;
+                pixel.vy = Math.sin(dir)*MeshGame.PIXEL_SPEED;
+                pixel.cooldown = MeshGame.PIXEL_COOLDOWN;
+                pixel.maxCooldown = MeshGame.PIXEL_COOLDOWN;
+            }
+            
+        }
 		
         public function transferPixel(pixel:Pixel, newController:IPixelController):void
         {
@@ -124,6 +145,7 @@ package com.mesh
                         addPixel(mp);
                     }
                 }
+				mesh.update();
             }
 
             for each(var pixel:Pixel in pixels)
@@ -213,7 +235,7 @@ package com.mesh
                         
                         if(pixel.controller == this)
                         {
-                            toBeAbsorbed.push(pixel);
+                            if(pixel.cooldown == 0) toBeAbsorbed.push(pixel);
                         }else{
                             //add us to the MAD list if we're not in there already...
                             if(wantsMAD.indexOf(pixel.controller) == -1)
@@ -241,6 +263,14 @@ package com.mesh
                         for each(var deadPixel:Pixel in MADFodder)
                         {
                             deadPixel.controller.transferPixel(deadPixel, this);
+                        }
+                        
+                        for each(var maybeDeadMesh:Mesh in meshes)
+                        {
+                            if(maybeDeadMesh.markedForDeath)
+                            {
+                                removeMesh(maybeDeadMesh);
+                            }
                         }
                     }
                     
