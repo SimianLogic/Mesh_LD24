@@ -29,6 +29,9 @@ package
         public var currentLevel:int = 0;
         public var levels:Array;
         
+        public var state:int;
+        public static const MENU:int = 0;
+        public static const GAME:int = 1;
 		public function MeshGame()
 		{
             levels = [MeshLevel.LEVEL_1, MeshLevel.LEVEL_2,MeshLevel.LEVEL_3, MeshLevel.LEVEL_4];
@@ -38,12 +41,26 @@ package
             Controller.registerAction("space",32);
             Controller.registerAction("esc", 27);
             
-            play();
-            
-			this.addEventListener(Event.ENTER_FRAME, update);	
+            showMenu();
+           
+            this.addEventListener(Event.ENTER_FRAME, update);		
 		}
+        
+        public var menuSprite:MainMenu;
+        public function showMenu():void
+        {
+            state = MENU;
+            
+            menuSprite ||= new MainMenu();
+            addChild(menuSprite);
+            
+            menuSprite.tf.text = "level " + (currentLevel+1);
+        }
+        
         public function play():void
         {
+            state = GAME;
+            
             //this yields final dimensions of 450x450 -- 30,30,14
             //other possible dimensions: 45,45,9 / 50,50,8 / 75,75,5 / 90,90,4 / 150,150,2
             //smaller dimensions: 10,10,44 (TOO SMALL) / 18,18,24
@@ -58,7 +75,8 @@ package
             {
                 arena.removeEventListener("nextLevel", nextLevelHandler);
                 arena.removeEventListener("restart", nextLevelHandler);
-                removeChild(arena);
+                arena.removeEventListener("menu", menuHandler);
+                if(contains(arena)) removeChild(arena);
                 arena = null;
             }
 
@@ -69,6 +87,7 @@ package
             
             arena.addEventListener("nextLevel", nextLevelHandler);
             arena.addEventListener("restart", restartHandler);
+            arena.addEventListener("menu", menuHandler);
             
             player = new Mesh();
             
@@ -87,6 +106,11 @@ package
         {
             play();
         }
+        public function menuHandler(e:Event=null):void
+        {
+            removeChild(arena);
+            showMenu();
+        }
         public function nextLevelHandler(e:Event=null):void
         {
             currentLevel++;
@@ -99,6 +123,36 @@ package
         private var maxOsc:int = 5;
 		public function update(e:Event=null):void
 		{
+            if(state == MENU) updateMenu();
+            if(state == GAME) updateGame();
+        }
+        
+        public function updateMenu():void
+        {
+            var input:Array = Controller.getUpdates();
+            
+            if(input[0].indexOf("left") >= 0)
+            {
+                currentLevel--;
+                if(currentLevel < 0) currentLevel = levels.length - 1;
+                menuSprite.tf.text = "level " + (currentLevel+1);
+            }
+            if(input[0].indexOf("right") >= 0)
+            {
+                currentLevel++;
+                if(currentLevel > levels.length -1) currentLevel = 0;
+                menuSprite.tf.text = "level " + (currentLevel+1);
+            }
+            
+            if(input[0].indexOf("space") >= 0)
+            {
+                removeChild(menuSprite);
+                play();
+            }
+        }
+        
+        public function updateGame():void
+        {
             frame++;
             
             var h:int = 0;

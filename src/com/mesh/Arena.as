@@ -397,7 +397,7 @@ package com.mesh
             stage.removeEventListener("controller:space", resetHandler);
             stage.removeEventListener("controller:esc", menuHandler);
             empty();
-            trace("TODO: menu?");
+            dispatchEvent(new Event("menu"));
         }
         
         public var winPopup:MovieClip;
@@ -424,7 +424,7 @@ package com.mesh
             stage.removeEventListener("controller:space", nextHandler);
             stage.removeEventListener("controller:esc", winMenuHandler);
             empty();
-            trace("TODO: menu?");
+            dispatchEvent(new Event("menu"));
         }
         
 		
