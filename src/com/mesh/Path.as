@@ -33,7 +33,6 @@ package com.mesh
                 actionIndex += actionDirection;
 				if(actionIndex == 0 && actionDirection == -1)
 				{
-                    trace("Go up!");
 					actionDirection = 1;
 				}
 				
@@ -42,11 +41,9 @@ package com.mesh
                     if(actions[actions.length -1].action == "loop" && actions[actions.length -1].px == actions[0].px && actions[actions.length -1].py == actions[0].py)
                     {
                         //loops!
-                        trace("LOOP!");
                         actionIndex = 0;
                     }else{
                         //oscillate
-                        trace("Go down!");
                         actionDirection = -1                        
                     }
                 }

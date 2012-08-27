@@ -32,34 +32,43 @@ package
 		public function MeshGame()
 		{
             levels = [MeshLevel.LEVEL_1, MeshLevel.LEVEL_2,MeshLevel.LEVEL_3, MeshLevel.LEVEL_4];
-            
-//			var pixelWidth:int = 64;
-//			var pixelHeight:int = 48;
-//			var pixelSize:int = 9;
-            var pixelWidth:int = 18;
-            var pixelHeight:int = 18
-            var pixelSize:int = 24;
-            
-            //this yields final dimensions of 450x450 -- 30,30,14
-            //other possible dimensions: 45,45,9 / 50,50,8 / 75,75,5 / 90,90,4 / 150,150,2
-            //smaller dimensions: 10,10,44 (TOO SMALL) / 18,18,24
-            
+           
             controller = Controller.getInstance(stage);
             
             Controller.registerAction("space",32);
             Controller.registerAction("esc", 27);
             
-//            Controller.registerAction("spin",32); //spacebar
-//            Controller.registerAction("spinLeft", 80);
-//            Controller.registerAction("pause", 80);
+            play();
+            
+			this.addEventListener(Event.ENTER_FRAME, update);	
+		}
+        public function play():void
+        {
+            //this yields final dimensions of 450x450 -- 30,30,14
+            //other possible dimensions: 45,45,9 / 50,50,8 / 75,75,5 / 90,90,4 / 150,150,2
+            //smaller dimensions: 10,10,44 (TOO SMALL) / 18,18,24
+            
+            var level:MeshLevel = MeshLevel.parse(levels[currentLevel]);
+            
+            var pixelWidth:int = level.pixelWidth;
+            var pixelHeight:int = level.pixelHeight;
+            var pixelSize:int = level.pixelSize;
+            
+            if(arena)
+            {
+                arena.removeEventListener("nextLevel", nextLevelHandler);
+                arena.removeEventListener("restart", nextLevelHandler);
+                removeChild(arena);
+                arena = null;
+            }
 
-			
-			arena = new Arena(pixelWidth, pixelHeight, pixelSize);
-			addChild(arena);
+            arena = new Arena(pixelWidth, pixelHeight, pixelSize);
+            addChild(arena);
             arena.x = 15;
             arena.y = 15;
             
             arena.addEventListener("nextLevel", nextLevelHandler);
+            arena.addEventListener("restart", restartHandler);
             
             player = new Mesh();
             
@@ -67,26 +76,22 @@ package
             player.addSlot(new PixelSlot(0, 1, 0x0000ff, true));
             player.addSlot(new PixelSlot(1, 0, 0x0000ff, true));
             player.addSlot(new PixelSlot(0, -1, 0x0000ff, true));
-            player.addSlot(new PixelSlot(-1, 0, 0x0000ff, true));
-            //sword form!
-//            addSlot(new PixelSlot(-2, 0, 0x00ff00));
-//            addSlot(new PixelSlot(-3, 0, 0x00ff00));
-            
-            
-//            player.setBounds(0,0,pixelWidth, pixelHeight);
-//            arena.addMesh(player);
-            
-            var level1:MeshLevel = MeshLevel.parse(MeshLevel.LEVEL_1);
-            arena.play(level1, player);
-            
-			this.addEventListener(Event.ENTER_FRAME, update);	
-		}
+            player.addSlot(new PixelSlot(-1, 0, 0x0000ff, true));    
+
+            trace("START " + currentLevel);
+            trace(levels[currentLevel]);
+            arena.play(level, player);
+        }
         
+        public function restartHandler(e:Event=null):void
+        {
+            play();
+        }
         public function nextLevelHandler(e:Event=null):void
         {
             currentLevel++;
             if(currentLevel >= levels.length) currentLevel = 0;
-            arena.play(MeshLevel.parse(levels[currentLevel]), player);
+            play();
         }
 		
         private var osc:int = 0;

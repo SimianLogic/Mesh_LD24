@@ -65,6 +65,7 @@ package com.mesh
         
         public function empty():void
         {
+            trace("EMPTY");
             for(var i:int = 0; i < pixels.length; i++)
             {
                 pixels[i].controller = null;
@@ -79,11 +80,10 @@ package com.mesh
         public function play(level:MeshLevel, player:Mesh):void
         {   
             implode = false;
+            empty();
             
             currentLevel = level;
             currentPlayer = player;
-            
-            empty();
             
             pixelSize = level.pixelSize;
             pixelWidth = level.pixelWidth;
@@ -106,7 +106,7 @@ package com.mesh
             
             stage.addChild(titleCard);
             stage.addEventListener("controller:space", function(event:Event=null):void {
-                stage.removeChild(titleCard);
+                titleCard.parent.removeChild(titleCard);
                 titleCard = null;
                 event.currentTarget.removeEventListener(event.type, arguments.callee);
             }, false, 0, true);
@@ -196,6 +196,7 @@ package com.mesh
             }
 		}
 		
+        public var victoryQueued:Boolean = false;
 		public function update(dt:int=0):void
 		{
 			resetCollisions();
@@ -214,7 +215,6 @@ package com.mesh
 				mesh.update();
             }
 
-            trace("PIXELS: " + pixels.length);
             for each(var pixel:Pixel in pixels)
             {
                 if(implode && pixel.controller == this)
@@ -252,8 +252,9 @@ package com.mesh
             
 			resolveCollisions();
             
-            if(pixels.length == currentPlayer.pixels.length)
+            if(pixels.length == currentPlayer.pixels.length && !victoryQueued)
             {
+                victoryQueued = true;
                 setTimeout(showVictory, 250);       
             }
 		}
@@ -361,6 +362,7 @@ package com.mesh
                             }
                         }
                         
+                        //this only handles a board with all smart meshes--brainless meshes are never culled...
                         if(meshes.length == 1 && meshes[0] == currentPlayer)
                         {
                             trace("YOU WIN!");
@@ -387,7 +389,7 @@ package com.mesh
             stage.removeChild(escapePopup);
             stage.removeEventListener("controller:space", resetHandler);
             stage.removeEventListener("controller:esc", menuHandler);
-            restart();
+            dispatchEvent(new Event("restart"));
         }
         public function menuHandler(event:Event):void
         {
@@ -413,6 +415,7 @@ package com.mesh
             stage.removeChild(winPopup);
             stage.removeEventListener("controller:space", nextHandler);
             stage.removeEventListener("controller:esc", winMenuHandler);
+            restart();
             dispatchEvent(new Event("nextLevel"));
         }
         public function winMenuHandler(event:Event):void

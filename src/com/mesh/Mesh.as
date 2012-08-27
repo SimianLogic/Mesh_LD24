@@ -26,9 +26,8 @@ package com.mesh
         public var top:int;
         public var bottom:int;
         
-        private var _markedForDeath:Boolean = false;
+        public var markedForDeath:Boolean = false;
         public var hasBrain:Boolean = true;
-        public function get markedForDeath():Boolean{ return (_markedForDeath && hasBrain); }
 		
 		public var path:Path;
 		
@@ -50,7 +49,7 @@ package com.mesh
         
         public function reset(keepers:int):void
         {
-            _markedForDeath = false;
+            markedForDeath = false;
             var i:int = 0;
             for each(var pixelSlot:PixelSlot in pixelSlots)
             {
@@ -185,7 +184,7 @@ package com.mesh
             //did we hit brain matter?
             if(pixelSlots[0].pixel == pixel && hasBrain)
             {
-                _markedForDeath = true;                
+                markedForDeath = true;                
             }
             
             removePixel(pixel);
@@ -197,6 +196,23 @@ package com.mesh
             pixel.vy = Math.sin(dir)*MeshGame.PIXEL_SPEED;
             pixel.cooldown = MeshGame.PIXEL_COOLDOWN;
             pixel.maxCooldown = MeshGame.PIXEL_COOLDOWN;
+            
+            if(!hasBrain)
+            {
+                var alive:Boolean = false;
+                for each(var pixelSlot:PixelSlot in pixelSlots)
+                {
+                    if(pixelSlot.pixel != null)
+                    {
+                        alive = true;
+                        break;
+                    }
+                }
+                if(!alive)
+                {
+                    markedForDeath = true;
+                }
+            }
         }
                
         public function addPixel(pixel:Pixel):void
