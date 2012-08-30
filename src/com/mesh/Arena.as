@@ -95,7 +95,12 @@ package com.mesh
             player.setBounds(0,0,pixelWidth, pixelHeight);
             
             //the update loop will add the pixels for us 
-            meshes = level.meshes;
+            meshes = [];
+            var tm:Array = level.meshes;
+            for each(var m:Mesh in tm)
+            {
+                addMesh(m);
+            }
             
             addMesh(player);
             
@@ -129,6 +134,8 @@ package com.mesh
 		public function addMesh(mesh:Mesh):void
 		{
 			meshes.push(mesh);
+            
+            mesh.setBounds(0,0,pixelWidth, pixelHeight);
             
             var px:Array = mesh.pixels;
             for each(var pixel:Pixel in px)
