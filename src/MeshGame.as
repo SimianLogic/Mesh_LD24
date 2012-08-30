@@ -26,7 +26,7 @@ package
         public static var PIXEL_SPEED:Number = 0.25;
         public static var PIXEL_COOLDOWN:int = 60;
         
-        public var currentLevel:int = 0;
+        public var currentLevel:int = 5;
         public var levels:Array;
         
         public var state:int;
@@ -34,7 +34,9 @@ package
         public static const GAME:int = 1;
 		public function MeshGame()
 		{
-            levels = [MeshLevel.LEVEL_1, MeshLevel.LEVEL_2,MeshLevel.LEVEL_3, MeshLevel.LEVEL_4];
+            //looking these up statically just to save time while tinkering
+            levels = MeshLevel.levels;
+            currentLevel = MeshLevel.START_LEVEL_INDEX;
            
             controller = Controller.getInstance(stage);
             
