@@ -77,6 +77,10 @@ package com.mesh
 			if(path == null) return;
 			
 			path.update();
+            
+            if(!path.tookAction) return;
+            
+            //react to our various special actions!
 			if(path.currentAction.action == PathAction.SPIN_LEFT) spinLeft();
 			if(path.currentAction.action == PathAction.SPIN_RIGHT) spinRight();
 		}

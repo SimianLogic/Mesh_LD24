@@ -24,13 +24,16 @@ package com.mesh
         public function get py():int { return actions[actionIndex].py };
 		public function get currentAction():PathAction { return actions[actionIndex]; }
         
+        public var tookAction:Boolean = false;
         public function update():void
         {
+            tookAction = false;
 			frame++;
             
             if(frame % frameDelay == 0 && actions.length > 1)
             {
                 actionIndex += actionDirection;
+                tookAction = true;
 				if(actionIndex == 0 && actionDirection == -1)
 				{
 					actionDirection = 1;
