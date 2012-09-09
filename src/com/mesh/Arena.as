@@ -67,7 +67,6 @@ package com.mesh
         
         public function empty():void
         {
-            trace("EMPTY");
             for(var i:int = 0; i < pixels.length; i++)
             {
                 pixels[i].controller = null;
@@ -345,7 +344,6 @@ package com.mesh
                         } 
                     }
                     
-                    if(wantsMAD.length) trace("MAD: " + wantsMAD.length + "   TBA: " + toBeAbsorbed.length);
                     //only absorb the pixels if we have a single absorber (MESH) which has a brain
                     if(wantsMAD.length == 1 && toBeAbsorbed.length > 0 && wantsMAD[0].hasBrain)
                     {
@@ -365,16 +363,22 @@ package com.mesh
                             deadPixel.controller.transferPixel(deadPixel, this);
                         }
                         
+                        var dead:Array = [];
                         for each(var maybeDeadMesh:Mesh in meshes)
-                        {
+                        {                            
                             if(maybeDeadMesh.markedForDeath)
                             {
-                                removeMesh(maybeDeadMesh);
-                                if(maybeDeadMesh == currentPlayer)
-                                {
-                                    //let the cooldown play, then let us start over
-                                    setTimeout(showGameOver, MeshGame.PIXEL_COOLDOWN * 17);
-                                }
+                                dead.push(maybeDeadMesh);
+                            }
+                        }
+                        
+                        for each(var deadMesh:Mesh in dead)
+                        {
+                            removeMesh(deadMesh);
+                            if(deadMesh == currentPlayer)
+                            {
+                                //let the cooldown play, then let us start over
+                                setTimeout(showGameOver, MeshGame.PIXEL_COOLDOWN * 17);
                             }
                         }
                         

@@ -10,8 +10,8 @@ package com.mesh
 		public var pixelSlots:Array;
         public var extraPixels:int;
         
-        public var px:Number;
-        public var py:Number;
+        public var px:Number = 0;
+        public var py:Number = 0;
         
         public var rotation:int;
         
@@ -49,6 +49,7 @@ package com.mesh
         
         public function reset(keepers:int):void
         {
+            trace("RESET!");
             markedForDeath = false;
             var i:int = 0;
             for each(var pixelSlot:PixelSlot in pixelSlots)
@@ -188,6 +189,7 @@ package com.mesh
             //did we hit brain matter?
             if(pixelSlots[0].pixel == pixel && hasBrain)
             {
+                if(pixelSlots.length == 5) trace("MARK PLAYER FOR DEATH");
                 markedForDeath = true;                
             }
             
@@ -201,6 +203,7 @@ package com.mesh
             pixel.cooldown = MeshGame.PIXEL_COOLDOWN;
             pixel.maxCooldown = MeshGame.PIXEL_COOLDOWN;
             
+            //if i'm a zombie, mark me for death when all my pixels are empty
             if(!hasBrain)
             {
                 var alive:Boolean = false;
@@ -234,7 +237,6 @@ package com.mesh
             }
             
             extraPixels++;
-            trace("NOW CARRYING " + extraPixels);
         }
         
         public function removePixel(pixel:Pixel):void

@@ -65,10 +65,6 @@ package
         {
             state = GAME;
             
-            //this yields final dimensions of 450x450 -- 30,30,14
-            //other possible dimensions: 45,45,9 / 50,50,8 / 75,75,5 / 90,90,4 / 150,150,2
-            //smaller dimensions: 10,10,44 (TOO SMALL) / 18,18,24
-            
             var level:MeshLevel = MeshLevel.parse(levels[currentLevel]);
             
             var pixelWidth:int = level.pixelWidth;
@@ -159,7 +155,7 @@ package
         {
             if(arena.PAUSED) return;
             
-            var MOVESPEED:Number = 0.75;
+            var MOVESPEED:Number = 0.70;
             frame++;
             
             var h:int = 0;

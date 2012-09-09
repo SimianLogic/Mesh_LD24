@@ -42,7 +42,7 @@ package com.mesh
 
         
         //convenience just so i only need to edit one file while working on levels
-        public static var START_LEVEL_INDEX:int = 6;
+        public static var START_LEVEL_INDEX:int = 5;
         
         
         public var id:int;
@@ -52,6 +52,9 @@ package com.mesh
         public var startY:int;
         
         //should maybe abstract these into small/medium/large boards?
+        //this yields final dimensions of 450x450 -- 30,30,14
+        //other possible dimensions: 45,45,9 / 50,50,8 / 75,75,5 / 90,90,4 / 150,150,2
+        //smaller dimensions: 10,10,44 (TOO SMALL) / 18,18,24
         public var pixelSize:int;
         public var pixelWidth:int;
         public var pixelHeight:int; 
