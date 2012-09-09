@@ -115,6 +115,7 @@ package com.mesh
                 titleCard = null;
                 event.currentTarget.removeEventListener(event.type, arguments.callee);
             }, false, 0, true);
+            stage.focus = stage;
         }
         
         public function restart():void
