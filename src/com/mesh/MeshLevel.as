@@ -99,6 +99,7 @@ package com.mesh
                 if(obj.hasOwnProperty("specials"))
                 {
                  if(obj["specials"].indexOf("zombie") >= 0) mesh.hasBrain = false;
+                 if(obj["specials"].indexOf("regen") >= 0)  mesh.hasRegen = true;
                 }
                 
                 for each(var slot:Object in obj["slots"])
