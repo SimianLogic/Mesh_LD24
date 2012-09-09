@@ -155,6 +155,8 @@ package
         
         public function updateGame():void
         {
+            if(arena.PAUSED) return;
+            
             frame++;
             
             var h:int = 0;
@@ -177,9 +179,6 @@ package
             }
 
             var input:Array = Controller.getUpdates();
-            
-//            if(Controller.isDown("spin")) player.spinRight();
-//            if(Controller.isDown("spinLeft")) player.spinLeft();
 
             if(input[0].indexOf("spin") >= 0) player.spinRight();
             if(input[0].indexOf("spinLeft") >= 0) player.spinLeft();

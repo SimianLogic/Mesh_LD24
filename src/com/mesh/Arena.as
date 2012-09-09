@@ -9,6 +9,8 @@ package com.mesh
 	
 	public class Arena extends Sprite implements IPixelController
 	{
+        public var PAUSED:Boolean = false;
+        
 		//should these be passed in & make a dirty arena? not sure if i'll re-use them
 		public var boardColor:uint = 0x555555;
 		public var strokeColor:uint = 0x111111;
@@ -104,15 +106,21 @@ package com.mesh
             
             addMesh(player);
             
+            //because we PAUSE the game when we add a titleCard, update and draw are skipped
+            //call them manually so we can see the level behind the titlecard!
+            update();
+            draw();
             
             //TODO: initialize UI, show a splash screen?
             var titleCard:LevelIntro = new LevelIntro();
             titleCard.tf.text = "level " + level.id + "\n" + level.title;
             
             stage.addChild(titleCard);
+            PAUSED = true;
             stage.addEventListener("controller:space", function(event:Event=null):void {
                 titleCard.parent.removeChild(titleCard);
                 titleCard = null;
+                PAUSED = false;
                 event.currentTarget.removeEventListener(event.type, arguments.callee);
             }, false, 0, true);
             stage.focus = stage;
@@ -388,6 +396,7 @@ package com.mesh
             escapePopup ||= new GameOver();
             
             stage.addChild(escapePopup);
+            PAUSED = true;
             stage.addEventListener("controller:space", resetHandler, false, 0, true);
             stage.addEventListener("controller:esc", menuHandler, false, 0, true);
         }
@@ -395,6 +404,7 @@ package com.mesh
         public function resetHandler(event:Event):void
         {
             stage.removeChild(escapePopup);
+            PAUSED = false;
             stage.removeEventListener("controller:space", resetHandler);
             stage.removeEventListener("controller:esc", menuHandler);
             dispatchEvent(new Event("restart"));
@@ -402,6 +412,7 @@ package com.mesh
         public function menuHandler(event:Event):void
         {
             stage.removeChild(escapePopup);
+            PAUSED = false;
             stage.removeEventListener("controller:space", resetHandler);
             stage.removeEventListener("controller:esc", menuHandler);
             empty();
@@ -414,6 +425,7 @@ package com.mesh
             winPopup ||= new YouWin();
             
             stage.addChild(winPopup);
+            PAUSED = true;
             stage.addEventListener("controller:space", nextHandler, false, 0, true);
             stage.addEventListener("controller:esc", winMenuHandler, false, 0, true);
         }
@@ -421,6 +433,7 @@ package com.mesh
         public function nextHandler(event:Event):void
         {
             stage.removeChild(winPopup);
+            PAUSED = false;
             stage.removeEventListener("controller:space", nextHandler);
             stage.removeEventListener("controller:esc", winMenuHandler);
             restart();
@@ -429,6 +442,7 @@ package com.mesh
         public function winMenuHandler(event:Event):void
         {
             stage.removeChild(winPopup);
+            PAUSED = false;
             stage.removeEventListener("controller:space", nextHandler);
             stage.removeEventListener("controller:esc", winMenuHandler);
             empty();
