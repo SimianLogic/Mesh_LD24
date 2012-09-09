@@ -14,7 +14,6 @@ MINOR TODOs
 ===============
 * de-couple move speed from resolution so moving doesn't feel so fast (make loc a float)
 * make sure resolution-independence still works ok (just change a level)
-* use default values in JSON format so it's way smaller
 * create constants/names for each board resolution
 * add a flag to Mesh for whether it can regenerate (most enemies shouldn't)
 

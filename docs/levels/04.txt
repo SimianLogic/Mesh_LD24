@@ -8,35 +8,35 @@
   "startY": 16,
   "meshes":[
     {"x":7,"y":8, "slots":[
-      {"x":0,"y":0,"c":"g","filled":1},
-      {"x":-1,"y":0,"c":"b","filled":1},
-      {"x":0,"y":1,"c":"b","filled":1},
-      {"x":0,"y":-1,"c":"b","filled":1}
+      {"x":0,"y":0,"c":"g"},
+      {"x":-1,"y":0},
+      {"x":0,"y":1},
+      {"x":0,"y":-1}
     ], "path":{
       "frameDelay":4,
       "actions":[
         {"x":0,"y":0,"action":"wait"},
-        {"x":0,"y":1,"action":"move"},
-        {"x":0,"y":2,"action":"move"},
-        {"x":0,"y":3,"action":"move"},
-        {"x":0,"y":4,"action":"move"},
-        {"x":0,"y":5,"action":"move"}
+        {"x":0,"y":1},
+        {"x":0,"y":2},
+        {"x":0,"y":3},
+        {"x":0,"y":4},
+        {"x":0,"y":5}
       ]}
     },
     {"x":11,"y":8, "slots":[
-      {"x":0,"y":0,"c":"g","filled":1},
-      {"x":1,"y":0,"c":"b","filled":1},
-      {"x":0,"y":1,"c":"b","filled":1},
-      {"x":0,"y":-1,"c":"b","filled":1}
+      {"x":0,"y":0,"c":"g"},
+      {"x":1,"y":0},
+      {"x":0,"y":1},
+      {"x":0,"y":-1}
     ], "path":{
       "frameDelay":4,
       "actions":[
         {"x":0,"y":0,"action":"wait"},
-        {"x":0,"y":-1,"action":"move"},
-        {"x":0,"y":-2,"action":"move"},
-        {"x":0,"y":-3,"action":"move"},
-        {"x":0,"y":-4,"action":"move"},
-        {"x":0,"y":-5,"action":"move"}
+        {"x":0,"y":-1},
+        {"x":0,"y":-2},
+        {"x":0,"y":-3},
+        {"x":0,"y":-4},
+        {"x":0,"y":-5}
       ]}
     }
   ]

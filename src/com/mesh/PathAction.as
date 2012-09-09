@@ -16,7 +16,7 @@ package com.mesh
         {
             px = startX;
             py = startY;
-            action = startAction;
+            action = startAction || "move";
         }
     }
 }
