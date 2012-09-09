@@ -228,6 +228,7 @@ package com.mesh
                 {
                     pixel.controller = this;
                     pixelSlot.addPixel(pixel);
+                    computeBounds();
                     return;
                 }
             }
@@ -246,6 +247,8 @@ package com.mesh
             }else{
                 throw new Error("You can't take what I don't have!");
             }
+            
+            computeBounds();
         }
 		
         public function addSlot(slot:PixelSlot):void
@@ -288,6 +291,8 @@ package com.mesh
             bottom = 0;
             for each(var ps:PixelSlot in pixelSlots)
             {
+                if(ps.pixel == null) continue;
+                
                 left = Math.min(ps.px, left);
                 right = Math.max(ps.px, right);
                 top = Math.min(ps.py, top);
