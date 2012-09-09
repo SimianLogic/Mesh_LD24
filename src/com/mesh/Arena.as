@@ -344,8 +344,8 @@ package com.mesh
                         } 
                     }
                     
-                    //only absorb the pixels if we have a single absorber (MESH) which has a brain
-                    if(wantsMAD.length == 1 && toBeAbsorbed.length > 0 && wantsMAD[0].hasBrain)
+                    //only absorb the pixels if we have a single absorber (MESH) which can regen
+                    if(wantsMAD.length == 1 && toBeAbsorbed.length > 0 && wantsMAD[0].hasRegen)
                     {
                         //mesh.absorbPixels
                         for each(var absorbedPixel:Pixel in toBeAbsorbed)

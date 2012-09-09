@@ -90,6 +90,7 @@ package
             arena.addEventListener("menu", menuHandler);
             
             player = new Mesh();
+            player.hasRegen = true;
             
             player.addSlot(new PixelSlot(0, 0, 0x00ff00, true));
             player.addSlot(new PixelSlot(0, 1, 0x0000ff, true));

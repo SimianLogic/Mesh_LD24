@@ -31,8 +31,8 @@ package com.mesh
          *
         */
         
-        public static var LEVEL_1:String = '{"id":1,"title":"introduction","pixelSize":24,"pixelWidth":18,"pixelHeight":18,"startX":9,"startY":16,"meshes":[{"x":9,"y":9,"brain":0,"slots":[{"x":0,"y":0},{"x":0,"y":1},{"x":1,"y":0},{"x":-1,"y":0},{"x":0,"y":-1}]}]}';
-        public static var LEVEL_2:String = '{"id":2,"title":"more pixels","pixelSize":24,"pixelWidth":18,"pixelHeight":18,"startX":9,"startY":16,"meshes":[{"x":2,"y":5,"brain":0,"slots":[{"x":0,"y":0},{"x":0,"y":1},{"x":0,"y":2},{"x":0,"y":3},{"x":0,"y":4},{"x":0,"y":5},{"x":0,"y":6}]},{"x":15,"y":5,"brain":0,"slots":[{"x":0,"y":0},{"x":0,"y":1},{"x":0,"y":2},{"x":0,"y":3},{"x":0,"y":4},{"x":0,"y":5},{"x":0,"y":6}]}]}';
+        public static var LEVEL_1:String = '{"id":1,"title":"introduction","pixelSize":24,"pixelWidth":18,"pixelHeight":18,"startX":9,"startY":16,"meshes":[{"x":9,"y":9,"specials":["zombie"],"slots":[{"x":0,"y":0},{"x":0,"y":1},{"x":1,"y":0},{"x":-1,"y":0},{"x":0,"y":-1}]}]}';
+        public static var LEVEL_2:String = '{"id":2,"title":"more pixels","pixelSize":24,"pixelWidth":18,"pixelHeight":18,"startX":9,"startY":16,"meshes":[{"x":2,"y":5,"specials":["zombie"],"slots":[{"x":0,"y":0},{"x":0,"y":1},{"x":0,"y":2},{"x":0,"y":3},{"x":0,"y":4},{"x":0,"y":5},{"x":0,"y":6}]},{"x":15,"y":5,"specials":["zombie"],"slots":[{"x":0,"y":0},{"x":0,"y":1},{"x":0,"y":2},{"x":0,"y":3},{"x":0,"y":4},{"x":0,"y":5},{"x":0,"y":6}]}]}';
         public static var LEVEL_3:String = '{"id":3,"title":"brain food","pixelSize":24,"pixelWidth":18,"pixelHeight":18,"startX":9,"startY":16,"meshes":[{"x":9,"y":9,"slots":[{"x":0,"y":0,"c":"g"},{"x":0,"y":-1},{"x":0,"y":-2},{"x":0,"y":-3},{"x":0,"y":-4},{"x":1,"y":-3},{"x":-1,"y":-3},{"x":-2,"y":-3},{"x":2,"y":-3},{"x":-3,"y":-3},{"x":3,"y":-3},{"x":-3,"y":-2},{"x":3,"y":-2},{"x":-3,"y":-1},{"x":3,"y":-1},{"x":-3,"y":0},{"x":3,"y":0},{"x":-3,"y":1},{"x":3,"y":1}]}]}';
         public static var LEVEL_4:String = '{"id":4,"title":"moving targets","pixelSize":24,"pixelWidth":18,"pixelHeight":18,"startX":9,"startY":16,"meshes":[{"x":7,"y":8,"slots":[{"x":0,"y":0,"c":"g"},{"x":-1,"y":0},{"x":0,"y":1},{"x":0,"y":-1}],"path":{"frameDelay":4,"actions":[{"x":0,"y":0,"action":"wait"},{"x":0,"y":1},{"x":0,"y":2},{"x":0,"y":3},{"x":0,"y":4},{"x":0,"y":5}]}},{"x":11,"y":8,"slots":[{"x":0,"y":0,"c":"g"},{"x":1,"y":0},{"x":0,"y":1},{"x":0,"y":-1}],"path":{"frameDelay":4,"actions":[{"x":0,"y":0,"action":"wait"},{"x":0,"y":-1},{"x":0,"y":-2},{"x":0,"y":-3},{"x":0,"y":-4},{"x":0,"y":-5}]}}]}';
         public static var LEVEL_5:String = '{"id":5,"title":"rotator","pixelSize":24,"pixelWidth":18,"pixelHeight":18,"startX":9,"startY":16,"meshes":[{"x":9,"y":5,"slots":[{"x":0,"y":0,"c":"g"},{"x":1,"y":0},{"x":-1,"y":0},{"x":2,"y":0},{"x":-2,"y":0}],"path":{"frameDelay":4,"actions":[{"x":0,"y":0,"action":"wait"},{"x":1,"y":0},{"x":2,"y":0},{"x":3,"y":0},{"x":4,"y":0},{"x":5,"y":0},{"x":5,"y":0,"action":"spin_right"},{"x":5,"y":1},{"x":5,"y":2},{"x":5,"y":3},{"x":5,"y":4},{"x":5,"y":5},{"x":5,"y":5,"action":"spin_right"},{"x":4,"y":5},{"x":3,"y":5},{"x":2,"y":5},{"x":1,"y":5},{"x":0,"y":5},{"x":-1,"y":5},{"x":-2,"y":5},{"x":-3,"y":5},{"x":-4,"y":5},{"x":-5,"y":5},{"x":-5,"y":5,"action":"spin_right"},{"x":-5,"y":4},{"x":-5,"y":3},{"x":-5,"y":2},{"x":-5,"y":1},{"x":-5,"y":0},{"x":-5,"y":0,"action":"spin_right"},{"x":-4,"y":0},{"x":-3,"y":0},{"x":-2,"y":0},{"x":-1,"y":0},{"x":0,"y":0,"action":"loop"}]}}]}';
@@ -92,7 +92,14 @@ package com.mesh
                 var mesh:Mesh = new Mesh();
                 if(obj["x"]) mesh.px = obj["x"];
                 if(obj["y"]) mesh.py = obj["y"];
-                if(obj.hasOwnProperty("brain")) mesh.hasBrain = Boolean(obj["brain"]);
+                
+                //special property processing
+                //zombie => hasBrain:false
+                //regen => hasRegen:true
+                if(obj.hasOwnProperty("specials"))
+                {
+                 if(obj["specials"].indexOf("zombie") >= 0) mesh.hasBrain = false;
+                }
                 
                 for each(var slot:Object in obj["slots"])
                 {

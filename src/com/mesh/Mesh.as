@@ -27,7 +27,10 @@ package com.mesh
         public var bottom:int;
         
         public var markedForDeath:Boolean = false;
-        public var hasBrain:Boolean = true;
+        
+        //special properties -- default values are intentional -- putting the commented line in the mesh's "specials" array will switch it to the non-default
+        public var hasBrain:Boolean = true;  //zombie
+        public var hasRegen:Boolean = false; //regen
 		
 		public var path:Path;
 		
