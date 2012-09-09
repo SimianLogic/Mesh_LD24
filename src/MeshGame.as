@@ -12,6 +12,8 @@ package
 	import flash.display.Sprite;
 	import flash.events.Event;
 	
+	import flashx.textLayout.formats.Float;
+	
 	[SWF(width='640', height='480', backgroundColor='0xffffff', frameRate='30')]
 	public class MeshGame extends Sprite
 	{
@@ -157,6 +159,7 @@ package
         {
             if(arena.PAUSED) return;
             
+            var MOVESPEED:Number = 0.75;
             frame++;
             
             var h:int = 0;
@@ -183,7 +186,7 @@ package
             if(input[0].indexOf("spin") >= 0) player.spinRight();
             if(input[0].indexOf("spinLeft") >= 0) player.spinLeft();
             
-            if(Math.abs(h) > 0 || Math.abs(v) > 0) player.move(h,v);
+            if(Math.abs(h) > 0 || Math.abs(v) > 0) player.move(h*MOVESPEED,v*MOVESPEED);
             
             arena.update();
 		}

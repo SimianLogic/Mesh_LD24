@@ -10,8 +10,8 @@ package com.mesh
 		public var pixelSlots:Array;
         public var extraPixels:int;
         
-        public var px:int;
-        public var py:int;
+        public var px:Number;
+        public var py:Number;
         
         public var rotation:int;
         
@@ -164,7 +164,7 @@ package com.mesh
 			}
         }
         
-        public function move(dx:int, dy:int):void
+        public function move(dx:Number, dy:Number):void
         {
             if(Math.abs(maxX - minX) == 0) throw new Error("You must call setBounds before moving a mesh!");
             
