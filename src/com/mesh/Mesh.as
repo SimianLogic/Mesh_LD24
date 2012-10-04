@@ -42,6 +42,20 @@ package com.mesh
 
 		}
         
+        public static function fromMesh(mesh:Mesh):Mesh
+        {
+            var ret:Mesh = new Mesh();
+            for each(var pixelSlot:PixelSlot in mesh.pixelSlots)
+            {
+                ret.addSlot(new PixelSlot(pixelSlot.px, pixelSlot.py, pixelSlot.color, pixelSlot.pixel != null));
+            }
+            
+            ret.hasBrain = mesh.hasBrain;
+            ret.hasRegen = mesh.hasRegen;
+            
+            return ret;
+        }
+        
         public function clear():void
         {
             for each(var pixelSlot:PixelSlot in pixelSlots)
@@ -52,6 +66,8 @@ package com.mesh
         
         public function reset(keepers:int):void
         {
+            if(keepers == -1) keepers = pixelSlots.length;
+            
             trace("RESET!");
             markedForDeath = false;
             var i:int = 0;
@@ -256,6 +272,18 @@ package com.mesh
             computeBounds();
         }
 		
+        public function slotFor(x:int, y:int):PixelSlot
+        {
+            for each(var ps:PixelSlot in pixelSlots)
+            {
+                if(ps.px == x && ps.py == y)
+                {
+                    return ps;
+                }
+            }
+            return null;
+        }
+        
         public function addSlot(slot:PixelSlot):void
         {
             for each(var ps:PixelSlot in pixelSlots)
@@ -272,18 +300,26 @@ package com.mesh
             top = Math.min(slot.py, top);
             bottom = Math.max(slot.py, bottom);
             
-            if(slot.pixel != null) slot.pixel.controller = this;
-            pixelSlots.push(slot);    
+            if(slot.pixel != null) 
+            {
+                trace("ADD SLOT WITH PIXEL");
+                slot.pixel.controller = this;
+            }
+            
+            pixelSlots.push(slot);  
         }
         
         public function removeSlot(slot:PixelSlot):void
         {
+            if(slot.pixel != null)
+            {
+                removePixel(slot.pixel);
+            }
+            
             if(pixelSlots.indexOf(slot) >= 0)
             {
                 pixelSlots.splice(pixelSlots.indexOf(slot), 1);
             }
-            
-            if(slot.pixel != null) slot.pixel.controller = null;
             
            computeBounds();
         }

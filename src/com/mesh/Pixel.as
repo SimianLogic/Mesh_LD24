@@ -27,6 +27,8 @@ package com.mesh
 			vx = _vx;
 			vy = _vy;
 			
+            mouseEnabled = false;
+            
 			draw();
 		}
         

@@ -5,7 +5,9 @@ MAYBE TODOs
 
 MAJOR TODOs
 ===============
-* mesh editor, add a pixel after each level
+* add a pixel after each level
+* player pixel budgets (remove pixel to get one back)
+* automatically scale an arena to the next size if the player won't fit in the spawn position
 * path editor for motion/AI meshes
 * submesh support
 
@@ -13,7 +15,6 @@ MAJOR TODOs
 MINOR TODOs
 ===============
 * create constants/names for each board resolution
-* add a flag to Mesh for whether it can regenerate (most enemies shouldn't)
 * add a fade-out timer for free pixels
 
 BUGS

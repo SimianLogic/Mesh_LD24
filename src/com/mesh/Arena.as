@@ -5,6 +5,7 @@ package com.mesh
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
+	import flash.geom.Point;
 	import flash.utils.setTimeout;
 	
 	public class Arena extends Sprite implements IPixelController
@@ -24,6 +25,8 @@ package com.mesh
         public var implode:Boolean = false;
 		public var meshes:Array;
 		public var collisionCheck:Array;
+        
+        public var active:Boolean = true;
 		
 		public function get pixelWidth():int { return _pixelWidth; }
 		public function get pixelHeight():int { return _pixelHeight; }
@@ -65,6 +68,13 @@ package com.mesh
 			resetCollisions();
 		}
         
+        public function localToPixel(hitX:int, hitY:int):Array
+        {
+            var x:int = Math.floor(hitX / (pixelSize + 1));
+            var y:int = Math.floor(hitY / (pixelSize + 1));
+            return [x,y];
+        }
+        
         public function empty():void
         {
             for(var i:int = 0; i < pixels.length; i++)
@@ -90,7 +100,12 @@ package com.mesh
             pixelWidth = level.pixelWidth;
             pixelHeight = level.pixelHeight;
             
-            player.reset(5); //keep your first 5 pixelSlots only!
+            //may want to eventually limit to the first 5 pixelSlots only
+            //but for now give them their whole mesh!
+            player.reset(-1);
+            
+            //TODO: see if the player will fit, otherwise upgrade to the next size
+            
             player.px = level.startX;
             player.py = level.startY;
             player.setBounds(0,0,pixelWidth, pixelHeight);
@@ -203,7 +218,7 @@ package com.mesh
 			if(pixels.indexOf(pixel) >= 0)
 			{
 				pixels.splice(pixels.indexOf(pixel), 1);
-				removeChild(pixel);
+				if(contains(pixel)) removeChild(pixel);
                 pixel.cooldown = 0;
                 pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
 			}else{
@@ -232,6 +247,12 @@ package com.mesh
 
             for each(var pixel:Pixel in pixels)
             {
+                if(pixel.controller == null)
+                {
+                    removePixel(pixel);
+                    continue;
+                }
+                
                 if(implode && pixel.controller == this)
                 {
                     pixel.cooldown = 0;
@@ -267,7 +288,7 @@ package com.mesh
             
 			resolveCollisions();
             
-            if(pixels.length == currentPlayer.pixels.length && !victoryQueued)
+            if(pixels.length == currentPlayer.pixels.length && !victoryQueued && active)
             {
                 victoryQueued = true;
                 setTimeout(showVictory, 250);       
@@ -313,6 +334,8 @@ package com.mesh
         		
 		public function resolveCollisions():void
 		{
+            if(!active) return;
+            
 			for(var i:int = 0; i < collisionCheck.length; i++)
 			{
 				if(collisionCheck[i].length > 1)

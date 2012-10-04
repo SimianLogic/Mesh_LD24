@@ -3,16 +3,12 @@ package
 	import com.mesh.Arena;
 	import com.mesh.Controller;
 	import com.mesh.Mesh;
+	import com.mesh.MeshEditor;
 	import com.mesh.MeshLevel;
-	import com.mesh.Path;
-	import com.mesh.PathAction;
-	import com.mesh.Pixel;
 	import com.mesh.PixelSlot;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
-	
-	import flashx.textLayout.formats.Float;
 	
 	[SWF(width='640', height='480', backgroundColor='0xffffff', frameRate='30')]
 	public class MeshGame extends Sprite
@@ -20,20 +16,27 @@ package
 		public var frame:int = 0;
         public var frameDelay:int = 4;
         
+        //current, active arena and current, active player
 		public var arena:Arena;
         public var player:Mesh;
-        public var enemy:Mesh;
+        
+        //arena used for upgrading, and the player's design for their mesh
+        public var upgradeArena:MeshEditor;        
+        public var upgradePlayer:Mesh;
+
         public var controller:Controller;
 		
         public static var PIXEL_SPEED:Number = 0.25;
         public static var PIXEL_COOLDOWN:int = 60;
         
-        public var currentLevel:int = 5;
+        public var currentLevel:int = 0;
         public var levels:Array;
         
         public var state:int;
         public static const MENU:int = 0;
         public static const GAME:int = 1;
+        public static const UPGRADE:int = 2;
+        
 		public function MeshGame()
 		{
             //looking these up statically just to save time while tinkering
@@ -44,9 +47,18 @@ package
             
             Controller.registerAction("space",32);
             Controller.registerAction("esc", 27);
+            Controller.registerAction("upgrade", 85);
+            
+            upgradePlayer = new Mesh();
+            upgradePlayer.hasRegen = true;
+            upgradePlayer.addSlot(new PixelSlot(0, 0, 0x00ff00, true));
+            upgradePlayer.addSlot(new PixelSlot(0, 1, 0x0000ff, true));
+            upgradePlayer.addSlot(new PixelSlot(1, 0, 0x0000ff, true));
+            upgradePlayer.addSlot(new PixelSlot(0, -1, 0x0000ff, true));
+            upgradePlayer.addSlot(new PixelSlot(-1, 0, 0x0000ff, true));
             
             showMenu();
-           
+            
             this.addEventListener(Event.ENTER_FRAME, update);		
 		}
         
@@ -61,6 +73,40 @@ package
             menuSprite.tf.text = "level " + (currentLevel+1);
         }
         
+        public function upgrade():void
+        {
+            state = UPGRADE;
+                        
+            var pixelWidth:int = 9;
+            var pixelHeight:int = 9;
+            var pixelSize:int = 49;
+            
+            //no reason to dispose of upgradeArena each time...it's data can only change while upgrading
+            if(upgradeArena == null)
+            {
+                upgradeArena = new MeshEditor(pixelWidth, pixelHeight, pixelSize);
+                upgradeArena.x = 15;
+                upgradeArena.y = 15;
+                upgradeArena.active = false;
+            }
+                
+            addChild(upgradeArena);
+            
+            upgradeArena.play(MeshEditor.arena, upgradePlayer);
+        }
+        
+        public function disposeOfArena(old_arena:Arena):void
+        {
+            if(old_arena)
+            {
+                old_arena.removeEventListener("nextLevel", nextLevelHandler);
+                old_arena.removeEventListener("restart", nextLevelHandler);
+                old_arena.removeEventListener("menu", menuHandler);
+                if(contains(old_arena)) removeChild(old_arena);
+                old_arena = null;
+            }
+        }
+        
         public function play():void
         {
             state = GAME;
@@ -71,14 +117,7 @@ package
             var pixelHeight:int = level.pixelHeight;
             var pixelSize:int = level.pixelSize;
             
-            if(arena)
-            {
-                arena.removeEventListener("nextLevel", nextLevelHandler);
-                arena.removeEventListener("restart", nextLevelHandler);
-                arena.removeEventListener("menu", menuHandler);
-                if(contains(arena)) removeChild(arena);
-                arena = null;
-            }
+            disposeOfArena(arena);
 
             arena = new Arena(pixelWidth, pixelHeight, pixelSize);
             addChild(arena);
@@ -89,17 +128,7 @@ package
             arena.addEventListener("restart", restartHandler);
             arena.addEventListener("menu", menuHandler);
             
-            player = new Mesh();
-            player.hasRegen = true;
-            
-            player.addSlot(new PixelSlot(0, 0, 0x00ff00, true));
-            player.addSlot(new PixelSlot(0, 1, 0x0000ff, true));
-            player.addSlot(new PixelSlot(1, 0, 0x0000ff, true));
-            player.addSlot(new PixelSlot(0, -1, 0x0000ff, true));
-            player.addSlot(new PixelSlot(-1, 0, 0x0000ff, true));    
-
-            trace("START " + currentLevel);
-            trace(levels[currentLevel]);
+            player = Mesh.fromMesh(upgradePlayer);
             arena.play(level, player);
         }
         
@@ -126,6 +155,22 @@ package
 		{
             if(state == MENU) updateMenu();
             if(state == GAME) updateGame();
+            if(state == UPGRADE) updateUpgrade();
+        }
+        
+        public function updateUpgrade():void
+        {
+            var input:Array = Controller.getUpdates();
+            if(input[0].indexOf("esc") >= 0)
+            {
+                if(contains(upgradeArena))
+                {
+                    removeChild(upgradeArena);
+                    showMenu();
+                }
+            }
+            
+            upgradeArena.update();
         }
         
         public function updateMenu():void
@@ -149,6 +194,12 @@ package
             {
                 removeChild(menuSprite);
                 play();
+            }
+            
+            if(input[0].indexOf("upgrade") >= 0)
+            {
+                removeChild(menuSprite);
+                upgrade();
             }
         }
         
