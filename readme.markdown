@@ -6,6 +6,7 @@ MAYBE TODOs
 MAJOR TODOs
 ===============
 * add a pixel after each level
+* only allow pixels connected to the main body
 * player pixel budgets (remove pixel to get one back)
 * automatically scale an arena to the next size if the player won't fit in the spawn position
 * path editor for motion/AI meshes
@@ -14,7 +15,6 @@ MAJOR TODOs
 
 MINOR TODOs
 ===============
-* create constants/names for each board resolution
 * add a fade-out timer for free pixels
 
 BUGS

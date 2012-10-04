@@ -96,9 +96,9 @@ package com.mesh
             currentLevel = level;
             currentPlayer = player;
             
-            pixelSize = level.pixelSize;
-            pixelWidth = level.pixelWidth;
-            pixelHeight = level.pixelHeight;
+            pixelSize = level.size.pixelSize;
+            pixelWidth = level.size.pixelWidth;
+            pixelHeight = level.size.pixelHeight;
             
             //may want to eventually limit to the first 5 pixelSlots only
             //but for now give them their whole mesh!

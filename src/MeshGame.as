@@ -113,9 +113,9 @@ package
             
             var level:MeshLevel = MeshLevel.parse(levels[currentLevel]);
             
-            var pixelWidth:int = level.pixelWidth;
-            var pixelHeight:int = level.pixelHeight;
-            var pixelSize:int = level.pixelSize;
+            var pixelWidth:int = level.size.pixelWidth;
+            var pixelHeight:int = level.size.pixelHeight;
+            var pixelSize:int = level.size.pixelSize;
             
             disposeOfArena(arena);
 

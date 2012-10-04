@@ -1,9 +1,7 @@
 {
   "id": 1,
   "title": "introduction",
-  "pixelSize":24,
-  "pixelWidth":18,
-  "pixelHeight":18,
+  "arena":"18x18",
   "startX": 9,
   "startY": 16,
   "meshes":[

@@ -45,9 +45,7 @@ package com.mesh
                 _arena = new MeshLevel();
                 _arena.id = 0;
                 _arena.title = "Mesh Editor";
-                _arena.pixelSize = 49;
-                _arena.pixelWidth = 9;
-                _arena.pixelHeight = 9;
+                _arena.size = ArenaSize.byName("9x9");
                 _arena.startX = 4;
                 _arena.startY = 4;
             }
