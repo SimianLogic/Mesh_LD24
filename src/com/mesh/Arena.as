@@ -8,6 +8,8 @@ package com.mesh
 	import flash.geom.Point;
 	import flash.utils.setTimeout;
 	
+	import flashx.textLayout.formats.Float;
+	
 	public class Arena extends Sprite implements IPixelController
 	{
         public var PAUSED:Boolean = false;
@@ -257,11 +259,15 @@ package com.mesh
                 {
                     pixel.cooldown = 0;
                     pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
-                    pixel.round();
-                    if(pixel.px > currentPlayer.px) pixel.px--;
-                    if(pixel.py > currentPlayer.py) pixel.py--;
-                    if(pixel.px < currentPlayer.px) pixel.px++;
-                    if(pixel.py < currentPlayer.py) pixel.py++;
+                    
+                    var implodeSpeed:Number = 3.0;
+                    pixel.px = pixel.px + (currentPlayer.px - pixel.px)/implodeSpeed;
+                    pixel.py = pixel.py + (currentPlayer.py - pixel.py)/implodeSpeed;
+                    
+//                    if(pixel.px > currentPlayer.px) pixel.px--;
+//                    if(pixel.py > currentPlayer.py) pixel.py--;
+//                    if(pixel.px < currentPlayer.px) pixel.px++;
+//                    if(pixel.py < currentPlayer.py) pixel.py++;
                     
                 }else{
                 
