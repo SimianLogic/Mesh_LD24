@@ -39,11 +39,15 @@ package com.mesh
 		{
 			_pixelWidth = i;
 			_dirty = true;
+            
+            collisionCheck = new Array(_pixelWidth * _pixelHeight);
 		}
 		public function set pixelHeight(i:int):void
 		{
 			_pixelHeight = i;
 			_dirty = true;
+            
+            collisionCheck = new Array(_pixelWidth * _pixelHeight);
 		}
 		public function set pixelSize(i:int):void
 		{
@@ -97,16 +101,24 @@ package com.mesh
             
             currentLevel = level;
             currentPlayer = player;
-            
-            pixelSize = level.size.pixelSize;
-            pixelWidth = level.size.pixelWidth;
-            pixelHeight = level.size.pixelHeight;
-            
+           
             //may want to eventually limit to the first 5 pixelSlots only
             //but for now give them their whole mesh!
             player.reset(-1);
             
-            //TODO: see if the player will fit, otherwise upgrade to the next size
+            var size:ArenaSize = level.size;
+            
+            //see if the player will fit, otherwise upgrade to the next size
+            while(player.bottom + level.startY >= size.pixelHeight)
+            {
+                trace("UPGRADE");
+                size = ArenaSize.nextSize(size);
+                
+            }
+            
+            pixelSize = size.pixelSize;
+            pixelWidth = size.pixelWidth;
+            pixelHeight = size.pixelHeight;
             
             player.px = level.startX;
             player.py = level.startY;
@@ -490,6 +502,8 @@ package com.mesh
 				
 			var maxWidth:int = (pixelSize+1)*pixelWidth;
 			var maxHeight:int = (pixelSize+1)*pixelHeight;
+            
+            trace("DRAWING ARENA: " + pixelWidth + "x" + pixelHeight);
 			
 			//add an extra pixel for every border line
 			graphics.drawRect(0,0,maxWidth,maxHeight);			

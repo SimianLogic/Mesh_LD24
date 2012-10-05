@@ -38,16 +38,16 @@ package com.mesh
         
         
         private static var _arena:MeshLevel;
-        public static function get arena():MeshLevel
+        public static function getEditorLevel(size:int):MeshLevel
         {
             if(_arena == null)
             {
                 _arena = new MeshLevel();
                 _arena.id = 0;
                 _arena.title = "Mesh Editor";
-                _arena.size = ArenaSize.byName("9x9");
-                _arena.startX = 4;
-                _arena.startY = 4;
+                _arena.size = ArenaSize.byName(size + "x" + size);
+                _arena.startX = (size-1)/2;
+                _arena.startY = (size-1)/2;
             }
             
             return _arena;

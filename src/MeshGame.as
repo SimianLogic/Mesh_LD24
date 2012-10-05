@@ -92,7 +92,7 @@ package
                 
             addChild(upgradeArena);
             
-            upgradeArena.play(MeshEditor.arena, upgradePlayer);
+            upgradeArena.play(MeshEditor.getEditorLevel(5), upgradePlayer);
         }
         
         public function disposeOfArena(old_arena:Arena):void

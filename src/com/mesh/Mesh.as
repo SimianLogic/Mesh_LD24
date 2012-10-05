@@ -302,7 +302,6 @@ package com.mesh
             
             if(slot.pixel != null) 
             {
-                trace("ADD SLOT WITH PIXEL");
                 slot.pixel.controller = this;
             }
             
