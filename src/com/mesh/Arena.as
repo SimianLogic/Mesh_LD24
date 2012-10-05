@@ -107,6 +107,11 @@ package com.mesh
             player.reset(-1);
             
             var size:ArenaSize = level.size;
+            var startWidth:int = size.pixelWidth;
+            var startHeight:int = size.pixelHeight;
+            
+            var xOffset:int = 0;
+            var yOffset:int = 0;
             
             //see if the player will fit, otherwise upgrade to the next size
             while(player.bottom + level.startY >= size.pixelHeight)
@@ -114,14 +119,17 @@ package com.mesh
                 trace("UPGRADE");
                 size = ArenaSize.nextSize(size);
                 
+                //a little wasteful to do this every time, but we don't even need it most of the time
+                xOffset = (size.pixelWidth - startWidth)/2;
+                yOffset = Math.min(size.pixelHeight - (player.bottom + level.startY), size.pixelHeight - startHeight)/2;
             }
             
             pixelSize = size.pixelSize;
             pixelWidth = size.pixelWidth;
             pixelHeight = size.pixelHeight;
             
-            player.px = level.startX;
-            player.py = level.startY;
+            player.px = level.startX + xOffset;
+            player.py = level.startY + yOffset;
             player.setBounds(0,0,pixelWidth, pixelHeight);
             
             //the update loop will add the pixels for us 
@@ -130,6 +138,7 @@ package com.mesh
             for each(var m:Mesh in tm)
             {
                 addMesh(m);
+                m.move(xOffset, yOffset);
             }
             
             addMesh(player);
