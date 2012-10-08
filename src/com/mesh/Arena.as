@@ -8,8 +8,6 @@ package com.mesh
 	import flash.geom.Point;
 	import flash.utils.setTimeout;
 	
-	import flashx.textLayout.formats.Float;
-	
 	public class Arena extends Sprite implements IPixelController
 	{
         public var PAUSED:Boolean = false;
@@ -238,12 +236,15 @@ package com.mesh
 		}
 		public function removePixel(pixel:Pixel):void
 		{
+            trace("KILL");
 			if(pixels.indexOf(pixel) >= 0)
 			{
+                if(pixel.controller == this) pixel.controller == null;
+                
 				pixels.splice(pixels.indexOf(pixel), 1);
 				if(contains(pixel)) removeChild(pixel);
                 pixel.cooldown = 0;
-                pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
+                pixel.transform.colorTransform = new ColorTransform();
 			}else{
                 trace("BAD PIXEL!");
             }
@@ -276,38 +277,45 @@ package com.mesh
                     continue;
                 }
                 
-                if(implode && pixel.controller == this)
+                if(pixel.controller == this)
                 {
-                    pixel.cooldown = 0;
-                    pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
-                    
-                    var implodeSpeed:Number = 3.0;
-                    pixel.px = pixel.px + (currentPlayer.px - pixel.px)/implodeSpeed;
-                    pixel.py = pixel.py + (currentPlayer.py - pixel.py)/implodeSpeed;
-                    
-//                    if(pixel.px > currentPlayer.px) pixel.px--;
-//                    if(pixel.py > currentPlayer.py) pixel.py--;
-//                    if(pixel.px < currentPlayer.px) pixel.px++;
-//                    if(pixel.py < currentPlayer.py) pixel.py++;
-                    
-                }else{
-                
-                    //figure out where the pixel is going
-                    pixel.controller.updatePixel(pixel);
-                    
-                    if(pixel.cooldown > 0)
+                    if(implode)
                     {
-                        pixel.cooldown--;
-                        
+                        pixel.cooldown = 0;
+                        pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
+                    
+                        var implodeSpeed:Number = 3.0;
+                        pixel.px = pixel.px + (currentPlayer.px - pixel.px)/implodeSpeed;
+                        pixel.py = pixel.py + (currentPlayer.py - pixel.py)/implodeSpeed;
+                    }
+                                        
+                    pixel.cooldown--;
+                    
+                    if(pixel.cooldown >= 0)
+                    {                       
                         if(pixel.controller == this)
                         {
                             var pct:Number = 1.0 - Number(pixel.cooldown) / pixel.maxCooldown;
                             pixel.transform.colorTransform = new ColorTransform(0,0,0,1,255,255*pct,255*pct,0);
                         }
+                    }else if(pixel.cooldown >= -1*MeshGame.PIXEL_COOLDOWN){
+                        pixel.transform.colorTransform = new ColorTransform();
+                    }else if(pixel.cooldown >= -2*MeshGame.PIXEL_COOLDOWN){
+                        //percent from -1 to -2... should probably make gray_cooldown a constant too
+                        var grayPct:Number = -1*(pixel.cooldown + MeshGame.PIXEL_COOLDOWN) / MeshGame.PIXEL_COOLDOWN;
+                        var grayVal:Number = 255 - 155*grayPct;
+                        pixel.transform.colorTransform = new ColorTransform(0,0,0,1,grayVal, grayVal, grayVal,0);
+                    }else{
+                        //pixel expired!
+                        removePixel(pixel);
                     }
+                    
+                    
                 }   
-                
+                //figure out where the pixel is going
+                pixel.controller.updatePixel(pixel);
                 updatePixelLocation(pixel);
+                
                 
                 //store where it is in case anything else wants the same spot
                 collisionCheck[Math.round(pixel.px) + Math.round(pixel.py)*pixelWidth].push(pixel);                   
@@ -383,7 +391,7 @@ package com.mesh
                         
                         if(pixel.controller == this)
                         {
-                            if(pixel.cooldown == 0) toBeAbsorbed.push(pixel);
+                            if(pixel.cooldown <= 0) toBeAbsorbed.push(pixel);
                         }else{
                             //add us to the MAD list if we're not in there already...
                             if(wantsMAD.indexOf(pixel.controller) == -1)

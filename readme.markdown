@@ -17,12 +17,10 @@ MAJOR TODOs
 
 MINOR TODOs
 ===============
-* add a fade-out timer for free pixels
 
 BUGS
 ===============
-* re-visit resetting an arena so they don't have to be re-created every time
-
+* pieces are all white when entering level editor...
 
 
 DESIGN NOTES
