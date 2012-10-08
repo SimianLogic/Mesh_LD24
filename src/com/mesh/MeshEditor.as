@@ -8,6 +8,13 @@ package com.mesh
         {
             super(startPixelWidth, startPixelHeight, startPixelSize);
             this.addEventListener(MouseEvent.CLICK, handleClick);
+            showTitleCard = false;
+        }
+        
+        override public function play(level:MeshLevel, player:Mesh):void
+        {
+            super.play(level, player);
+            dirty = true;
         }
         
         public function handleClick(e:MouseEvent):void
@@ -28,14 +35,32 @@ package com.mesh
             if(slot)
             {
                 //var index:int = currentPlayer.pixelSlots.indexOf(slot);
-                trace("DELETING PIXELSLOT AT " + meshX + "," + meshY);
                 currentPlayer.removeSlot(slot);
             }else{
-                trace("ADDING PIXELSLOT AT " + meshX + "," + meshY);
                 currentPlayer.addSlot(new PixelSlot(meshX, meshY, 0x0000ff, true));
             }
+            dirty = true;
         }
         
+        public var dirty:Boolean;
+        override public function update(dt:int=0):void
+        {
+            super.update(dt);
+            
+            if(dirty)
+            {
+                currentPlayer.validate();
+                for each(var pixelSlot:PixelSlot in currentPlayer.pixelSlots)
+                {
+                    pixelSlot.pixel.draw();
+                    if(!pixelSlot.valid)
+                    {
+                        pixelSlot.pixel.invalidate();
+                    }
+                }
+                dirty = false;
+            }
+        }
         
         private static var _arena:MeshLevel;
         public static function getEditorLevel(size:int):MeshLevel

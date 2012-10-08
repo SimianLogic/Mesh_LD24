@@ -92,6 +92,7 @@ package com.mesh
         
         public var currentLevel:MeshLevel;
         public var currentPlayer:Mesh;
+        public var showTitleCard:Boolean = true;
         public function play(level:MeshLevel, player:Mesh):void
         {   
             implode = false;
@@ -128,6 +129,7 @@ package com.mesh
             
             player.px = level.startX + xOffset;
             player.py = level.startY + yOffset;
+            player.moveSpeed = size.moveSpeed;
             player.setBounds(0,0,pixelWidth, pixelHeight);
             
             //the update loop will add the pixels for us 
@@ -147,17 +149,20 @@ package com.mesh
             draw();
             
             //TODO: initialize UI, show a splash screen?
-            var titleCard:LevelIntro = new LevelIntro();
-            titleCard.tf.text = "level " + level.id + "\n" + level.title;
+            if(showTitleCard)
+            {
+                var titleCard:LevelIntro = new LevelIntro();
+                titleCard.tf.text = "level " + level.id + "\n" + level.title;
             
-            stage.addChild(titleCard);
-            PAUSED = true;
-            stage.addEventListener("controller:space", function(event:Event=null):void {
-                titleCard.parent.removeChild(titleCard);
-                titleCard = null;
-                PAUSED = false;
-                event.currentTarget.removeEventListener(event.type, arguments.callee);
-            }, false, 0, true);
+                stage.addChild(titleCard);
+                PAUSED = true;
+                stage.addEventListener("controller:space", function(event:Event=null):void {
+                    titleCard.parent.removeChild(titleCard);
+                    titleCard = null;
+                    PAUSED = false;
+                    event.currentTarget.removeEventListener(event.type, arguments.callee);
+                }, false, 0, true);
+            }
             stage.focus = stage;
         }
         
@@ -177,6 +182,9 @@ package com.mesh
 		
 		public function addMesh(mesh:Mesh):void
 		{
+            //needed to figure out what order to regenerate in if it regenerates
+            mesh.validate();
+            
 			meshes.push(mesh);
             
             mesh.setBounds(0,0,pixelWidth, pixelHeight);
@@ -236,7 +244,6 @@ package com.mesh
 		}
 		public function removePixel(pixel:Pixel):void
 		{
-            trace("KILL");
 			if(pixels.indexOf(pixel) >= 0)
 			{
                 if(pixel.controller == this) pixel.controller == null;
@@ -281,12 +288,18 @@ package com.mesh
                 {
                     if(implode)
                     {
+                        currentPlayer.px = Math.round(currentPlayer.px);
+                        currentPlayer.py = Math.round(currentPlayer.py);
+                        
                         pixel.cooldown = 0;
                         pixel.transform.colorTransform = new ColorTransform(1,1,1,1,0,0,0,0);
+                        
+                        pixel.vx = 0;
+                        pixel.vy = 0;
                     
                         var implodeSpeed:Number = 3.0;
-                        pixel.px = pixel.px + (currentPlayer.px - pixel.px)/implodeSpeed;
-                        pixel.py = pixel.py + (currentPlayer.py - pixel.py)/implodeSpeed;
+                        pixel.px += (currentPlayer.px - pixel.px)/implodeSpeed;
+                        pixel.py += (currentPlayer.py - pixel.py)/implodeSpeed;
                     }
                                         
                     pixel.cooldown--;
@@ -299,7 +312,7 @@ package com.mesh
                             pixel.transform.colorTransform = new ColorTransform(0,0,0,1,255,255*pct,255*pct,0);
                         }
                     }else if(pixel.cooldown >= -1*MeshGame.PIXEL_COOLDOWN){
-                        pixel.transform.colorTransform = new ColorTransform();
+                        pixel.transform.colorTransform = new ColorTransform(0,0,0,1,255,255,255,0);
                     }else if(pixel.cooldown >= -2*MeshGame.PIXEL_COOLDOWN){
                         //percent from -1 to -2... should probably make gray_cooldown a constant too
                         var grayPct:Number = -1*(pixel.cooldown + MeshGame.PIXEL_COOLDOWN) / MeshGame.PIXEL_COOLDOWN;
@@ -371,6 +384,8 @@ package com.mesh
 		{
             if(!active) return;
             
+            var wounded:Array = [];
+            
 			for(var i:int = 0; i < collisionCheck.length; i++)
 			{
 				if(collisionCheck[i].length > 1)
@@ -414,8 +429,8 @@ package com.mesh
                     
                     //MUTUALLY ASSURED DESTRUCTION!
                     if(wantsMAD.length >= 2)
-                    {
-                        //for now, simply destroy EVERYTHING... later could adapt it to do 1:1 pixel annihilation
+                    {   
+                        //for now, simply destroy EVERYTHING... later could adapt it to do 1:1 pixel annihilation, armor, etc...
                         for each(var deadPixel:Pixel in MADFodder)
                         {
                             deadPixel.controller.transferPixel(deadPixel, this);
@@ -423,7 +438,8 @@ package com.mesh
                         
                         var dead:Array = [];
                         for each(var maybeDeadMesh:Mesh in meshes)
-                        {                            
+                        {  
+                            wounded.push(maybeDeadMesh);
                             if(maybeDeadMesh.markedForDeath)
                             {
                                 dead.push(maybeDeadMesh);
@@ -444,17 +460,30 @@ package com.mesh
                         if(meshes.length == 1 && meshes[0] == currentPlayer)
                         {
                             trace("YOU WIN!");
-                            setTimeout(function():void{ implode = true; }, MeshGame.PIXEL_COOLDOWN * 17);
+                            setTimeout(function():void{ implode = true;}, MeshGame.PIXEL_COOLDOWN * 17);
                         }
                     }
                     
 				}
 			}
+            
+            for each(var mesh:Mesh in wounded)
+            {
+                //while we're in there see if we knocked anything else off
+                var orphans:Array = mesh.getOrphanPixels();
+                for each(var ps:PixelSlot in orphans)
+                {
+                    ps.pixel.controller.transferPixel(ps.pixel, this);
+                }
+            }
 		}
         
         public var escapePopup:MovieClip;
         public function showGameOver():void
         {
+            //return if we exited early
+            if(stage == null) return;
+            
             escapePopup ||= new GameOver();
             
             stage.addChild(escapePopup);

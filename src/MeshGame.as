@@ -205,9 +205,16 @@ package
         
         public function updateGame():void
         {
-            if(arena.PAUSED) return;
+            var input:Array = Controller.getUpdates();
+            if(input[0].indexOf("esc") >= 0)
+            {
+                trace("SHOW MENU");
+                removeChild(arena);
+                showMenu();
+            }
             
-            var MOVESPEED:Number = 0.70;
+            if(arena.PAUSED) return;
+
             frame++;
             
             var h:int = 0;
@@ -229,12 +236,11 @@ package
                 h++;
             }
 
-            var input:Array = Controller.getUpdates();
-
             if(input[0].indexOf("spin") >= 0) player.spinRight();
             if(input[0].indexOf("spinLeft") >= 0) player.spinLeft();
             
-            if(Math.abs(h) > 0 || Math.abs(v) > 0) player.move(h*MOVESPEED,v*MOVESPEED);
+            //player knows its own velocity!
+            if(Math.abs(h) > 0 || Math.abs(v) > 0) player.move(h,v);
             
             arena.update();
 		}

@@ -6,13 +6,12 @@ MAYBE TODOs
 MAJOR TODOs
 ===============
 * proper state/screen manager (sometimes losing reference to intro popup, which breaks the game)
-* add a pixel after each level
 * player pixel budgets (remove pixel to get one back)
-* only allow pixels connected to the main body 
 * store pixelType on PixelSlot (brain, mover, armored, etc...)
 * edit colors in the mesh editor
 * path editor for motion/AI meshes
 * submesh support
+* don't allow player to save mesh unless it's valid
 
 
 MINOR TODOs
@@ -20,7 +19,6 @@ MINOR TODOs
 
 BUGS
 ===============
-* pieces are all white when entering level editor...
 
 
 DESIGN NOTES

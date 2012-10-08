@@ -6,18 +6,20 @@ package com.mesh
         public var pixelSize:int;
         public var pixelWidth:int;
         public var pixelHeight:int;
+        public var moveSpeed:Number;
         
         
         //should maybe abstract these into small/medium/large boards?
         //this yields final dimensions of 450x450 -- 30,30,14
         //other possible dimensions: 45,45,9 / 50,50,8 / 75,75,5 / 90,90,4 / 150,150,2
         //smaller dimensions: 9,9,49 / 10,10,44 / 18,18,24
-        public function ArenaSize(name:String, pixelSize:int, pixelWidth:int, pixelHeight:int)
+        public function ArenaSize(name:String, pixelSize:int, pixelWidth:int, pixelHeight:int, moveSpeed:Number=0.7)
         {
             this.name = name;
             this.pixelSize = pixelSize;
             this.pixelWidth = pixelWidth;
             this.pixelHeight = pixelHeight;
+            this.moveSpeed = moveSpeed;
         }
         
         public static var _3x3:ArenaSize;
@@ -75,11 +77,11 @@ package com.mesh
                     return _15x15;
                     break;
                 case "18x18":
-                    if(_18x18 == null) _18x18 = new ArenaSize("18x18", 24, 18, 18);
+                    if(_18x18 == null) _18x18 = new ArenaSize("18x18", 24, 18, 18, 0.7);
                     return _18x18;
                     break;
                 case "25x25":
-                    if(_25x25 == null) _25x25 = new ArenaSize("25x25", 17, 25, 25);
+                    if(_25x25 == null) _25x25 = new ArenaSize("25x25", 17, 25, 25, 1.0);
                     return _25x25;
                     break;
                 case "30x30":

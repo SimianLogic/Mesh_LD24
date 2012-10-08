@@ -4,8 +4,6 @@ package com.mesh
 
 	public class Pixel extends Sprite
 	{
-		public static var ID_DISPATCHER:int = 0;
-		
 		public var px:Number;
 		public var py:Number;
 		public var vx:Number;
@@ -44,6 +42,15 @@ package com.mesh
 			graphics.beginFill(color);
 			graphics.drawRect(0,0,pixelSize,pixelSize);
 		}
+        
+        public function invalidate():void
+        {
+            graphics.lineStyle(2,0xff0000);
+            graphics.moveTo(0,0);
+            graphics.lineTo(pixelSize, pixelSize);
+            graphics.moveTo(pixelSize, 0);
+            graphics.lineTo(0,pixelSize);
+        }
 		
 	}
 }

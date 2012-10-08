@@ -1,17 +1,24 @@
 package com.mesh
 {
+    import flash.utils.Dictionary;
+
     //Mesh is just a data container--it has no knowledge of pixel sizes... it's pixels will get
     //sized propery when they're added to an arena.
 	
 	public class Mesh implements IPixelController
 	{
 		
+        public var valid:Boolean = true;
+        
 		//the first pixelSlot is always the root pixel
 		public var pixelSlots:Array;
         public var extraPixels:int;
         
         public var px:Number = 0;
         public var py:Number = 0;
+        
+        //slow, so you know something is broken...
+        public var moveSpeed:Number = 0.1;
         
         public var rotation:int;
         
@@ -25,6 +32,11 @@ package com.mesh
         public var right:int;
         public var top:int;
         public var bottom:int;
+        
+        public var slotLeft:int;
+        public var slotRight:int;
+        public var slotTop:int;
+        public var slotBottom:int;
         
         public var markedForDeath:Boolean = false;
         
@@ -41,6 +53,113 @@ package com.mesh
 			pixelSlots = [];
 
 		}
+        
+        //traverses all PixelSlots and makes sure they're connected to the brain
+        public function validate():void
+        {
+            if(!hasBrain) return;
+            
+            var island:Array = [];
+            
+            var root:PixelSlot = slotFor(0,0);
+            root.depth = 0;
+            root.valid = true;
+            
+            island.push(root);
+            
+            var depth:int = 1;
+            var toCheck:Array = neighborsFor(root);
+            var nextSet:Array = [];
+            
+            while(toCheck.length > 0)
+            {
+                var next:PixelSlot = toCheck.pop() as PixelSlot;
+                next.depth = depth;
+                next.valid = true;
+                island.push(next);
+                
+                var n:Array = neighborsFor(next);
+                for each(var ps:PixelSlot in n)
+                {
+                    if(island.indexOf(ps) == -1 && nextSet.indexOf(ps) == -1) nextSet.push(ps);                    
+                }
+                
+                if(toCheck.length == 0)
+                {
+                    toCheck = nextSet;
+                    nextSet = [];
+                    depth++;
+                }
+            }
+            
+            //invalidate the bad eggs
+            if(island.length == pixelSlots.length)
+            {
+                valid = true;   
+            }else{
+                valid = false;
+                for each(var ps:PixelSlot in pixelSlots)
+                {
+                    if(island.indexOf(ps) == -1)
+                    {
+                        ps.valid = false;
+                        ps.depth = PixelSlot.INVALID_DEPTH;
+                    }
+                }
+            }
+            
+            pixelSlots = pixelSlots.sortOn("depth");
+        }
+        
+        public function getOrphanPixels():Array
+        {
+            if(!hasBrain) return [];
+            
+            var root:PixelSlot = slotFor(0,0);
+            //no need to check for breakage if the whole thing is busted
+            if(root.pixel == null) return [];
+
+            var island:Array = [];
+            var empty:Array = [];
+            island.push(root);
+            
+            var toCheck:Array = neighborsFor(root);
+            
+            //simpler loop, since we're unconcerned with depth...
+            while(toCheck.length > 0)
+            {
+                var next:PixelSlot = toCheck.pop() as PixelSlot;
+
+                if(next.pixel == null)
+                {
+                    empty.push(next);
+                    //dead pixels don't have neighbors!
+                }else{
+                    island.push(next);
+                    
+                    var n:Array = neighborsFor(next);
+                    for each(var ps:PixelSlot in n)
+                    {
+                        if(island.indexOf(ps) == -1 && empty.indexOf(ps) == -1) toCheck.push(ps);                    
+                    }
+                }
+            }
+            
+            var found:Array = island.concat(empty);
+            var orphans:Array = [];
+            //cast out those that weren't found
+            if(found.length != pixelSlots.length)
+            {
+                for each(var ps:PixelSlot in pixelSlots)
+                {
+                    if(found.indexOf(ps) == -1)
+                    {
+                        if(ps.pixel != null) orphans.push(ps);          
+                    }
+                }
+            }
+            return orphans;
+        }
         
         public static function fromMesh(mesh:Mesh):Mesh
         {
@@ -78,9 +197,11 @@ package com.mesh
                     if(pixelSlot.pixel == null)
                     {
                         var pixel:Pixel = new Pixel();
-                        pixel.controller = this;
                         pixelSlot.addPixel(pixel);
                     }
+                    
+                    pixelSlot.pixel.controller = this;
+                    
                 }else{
                     if(pixelSlot.pixel != null)
                     {
@@ -184,9 +305,25 @@ package com.mesh
 			}
         }
         
+        public function moveAbsolute(dx:Number, dy:Number):void
+        {
+            //ASSUMES LEFT <= 0 and RIGHT >= 0
+            px = Math.min(maxX-right-1, Math.max(minX - left, px + dx));
+            //ASSUMES TOP <= 0 and BOTTOM >= 0
+            py = Math.min(maxY-bottom-1, Math.max(minY - top, py + dy));
+        }
+        
         public function move(dx:Number, dy:Number):void
         {
             if(Math.abs(maxX - minX) == 0) throw new Error("You must call setBounds before moving a mesh!");
+            
+            if(!isNaN(moveSpeed))
+            {
+                dx = dx * moveSpeed;
+                dy = dy * moveSpeed;
+            }else{
+                throw new Error("MOVESPEED IS NULL!");
+            }
             
             //ASSUMES LEFT <= 0 and RIGHT >= 0
             px = Math.min(maxX-right-1, Math.max(minX - left, px + dx));
@@ -284,6 +421,25 @@ package com.mesh
             return null;
         }
         
+        public function neighborsFor(pixelSlot:PixelSlot):Array
+        {
+            var ret:Array = [];
+            
+            var x:int = pixelSlot.px;
+            var y:int = pixelSlot.py;
+            var neighborLeft:PixelSlot = slotFor(x-1,y);
+            var neighborRight:PixelSlot = slotFor(x+1,y);
+            var neighborTop:PixelSlot = slotFor(x,y-1);
+            var neighborBottom:PixelSlot = slotFor(x,y+1);
+            
+            if(neighborLeft) ret.push(neighborLeft);
+            if(neighborRight) ret.push(neighborRight);
+            if(neighborTop) ret.push(neighborTop);
+            if(neighborBottom) ret.push(neighborBottom);
+            
+            return ret;
+        }
+        
         public function addSlot(slot:PixelSlot):void
         {
             for each(var ps:PixelSlot in pixelSlots)
@@ -306,6 +462,7 @@ package com.mesh
             }
             
             pixelSlots.push(slot);  
+            computeSlotBounds();
         }
         
         public function removeSlot(slot:PixelSlot):void
@@ -320,6 +477,7 @@ package com.mesh
                 pixelSlots.splice(pixelSlots.indexOf(slot), 1);
             }
             
+           computeSlotBounds();
            computeBounds();
         }
         
@@ -340,10 +498,27 @@ package com.mesh
             }
             
             //scooch us back in if we were out
-            while(right + px  >= maxX) move(-1, 0);
-            while(px + left < 0) move(1,0);
-            while(top + py < 0) move(0,1);
-            while(py + bottom >= maxY) move(0,-1);
+            while(right + px  >= maxX) moveAbsolute(-1, 0);
+            while(px + left < 0) moveAbsolute(1,0);
+            while(top + py < 0) moveAbsolute(0,1);
+            while(py + bottom >= maxY) moveAbsolute(0,-1);
+        }
+        
+        public function computeSlotBounds():void
+        {
+            slotLeft = 0;
+            slotRight = 0;
+            slotTop = 0;
+            slotBottom = 0;
+            for each(var ps:PixelSlot in pixelSlots)
+            {
+                slotLeft = Math.min(ps.px, slotLeft);
+                slotRight = Math.max(ps.px, slotRight);
+                slotTop = Math.min(ps.py, slotTop);
+                slotBottom = Math.max(ps.py, slotBottom);
+            }
+            
+            //no movement needed, these bounds are theoretical
         }
         
 		public function get pixels():Array

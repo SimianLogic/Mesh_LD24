@@ -2,11 +2,11 @@ package com.mesh
 {
 	public class PixelSlot
 	{
-		//keep a list of all our pixel slots, refill in order
-		public static var ID_DISPATCHER:int = 0;
-		
+        public static const INVALID_DEPTH:int = 10000;
+        public var depth:int = INVALID_DEPTH;
+        public var valid:Boolean;
+        
 		public var pixel:Pixel; //can be null
-		public var id:int;
 		
         public var color:uint;
 		public var px:int;
@@ -19,8 +19,6 @@ package com.mesh
 			
 			px = startX;
 			py = startY;
-			
-			id = ID_DISPATCHER++;
 		}
         
         public function addPixel(newPixel:Pixel):void
