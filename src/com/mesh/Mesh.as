@@ -98,12 +98,12 @@ package com.mesh
                 valid = true;   
             }else{
                 valid = false;
-                for each(var ps:PixelSlot in pixelSlots)
+                for each(var ps2:PixelSlot in pixelSlots)
                 {
-                    if(island.indexOf(ps) == -1)
+                    if(island.indexOf(ps2) == -1)
                     {
-                        ps.valid = false;
-                        ps.depth = PixelSlot.INVALID_DEPTH;
+                        ps2.valid = false;
+                        ps2.depth = PixelSlot.INVALID_DEPTH;
                     }
                 }
             }
@@ -150,11 +150,11 @@ package com.mesh
             //cast out those that weren't found
             if(found.length != pixelSlots.length)
             {
-                for each(var ps:PixelSlot in pixelSlots)
+                for each(var ps2:PixelSlot in pixelSlots)
                 {
-                    if(found.indexOf(ps) == -1)
+                    if(found.indexOf(ps2) == -1)
                     {
-                        if(ps.pixel != null) orphans.push(ps);          
+                        if(ps2.pixel != null) orphans.push(ps2);          
                     }
                 }
             }
