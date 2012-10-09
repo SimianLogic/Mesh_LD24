@@ -192,6 +192,8 @@ package com.mesh
             var i:int = 0;
             for each(var pixelSlot:PixelSlot in pixelSlots)
             {
+                if(!pixelSlot.valid) continue;
+                
                 if(i < keepers)
                 {
                     if(pixelSlot.pixel == null)
@@ -383,7 +385,7 @@ package com.mesh
             var gotcha:Boolean = false;
             for each(var pixelSlot:PixelSlot in pixelSlots)
             {
-                if(pixelSlot.pixel == null)
+                if(pixelSlot.pixel == null && pixelSlot.valid)
                 {
                     pixel.controller = this;
                     pixelSlot.addPixel(pixel);
