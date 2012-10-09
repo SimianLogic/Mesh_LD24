@@ -54,6 +54,102 @@ package com.mesh
 
 		}
         
+        
+        /*
+         *  Parses a mesh (i.e. from JSON or saved data) from an object into a Mesh
+         *
+         *          x: px
+         *          y: py
+         *          slots:(array of slots)
+         *              x:px
+         *              y:py
+         *              c:color (string)
+         *              filled: 0/1 (start filled or not?)
+         *          path:  -- OPTIONAL (if it's not moving, will use the default (0,0) path
+         *              frameDelay:(how often to step through the path)
+         *              actions:(array of path actions) 
+         *                  x:px
+         *                  y:py
+         *                  action:string
+         *
+         */
+        public static function fromObject(obj:Object):Mesh
+        {
+            var mesh:Mesh = new Mesh();
+            if(obj["x"]) mesh.px = obj["x"];
+            if(obj["y"]) mesh.py = obj["y"];
+            
+            //special property processing
+            //zombie => hasBrain:false
+            //regen => hasRegen:true
+            if(obj.hasOwnProperty("specials"))
+            {
+                if(obj["specials"].indexOf("zombie") >= 0) mesh.hasBrain = false;
+                if(obj["specials"].indexOf("regen") >= 0)  mesh.hasRegen = true;
+            }
+            
+            for each(var slot:Object in obj["slots"])
+            {
+                //default value is filled:true
+                var f:Boolean = true;
+                if(slot.hasOwnProperty("filled"))
+                {
+                    f = Boolean(slot["filled"]);
+                }
+                mesh.addSlot(new PixelSlot(slot["x"], slot["y"], colorFromC(slot["c"]), f));
+            }
+            
+            if(obj.hasOwnProperty("path"))
+            {
+                var actions:Array = [];
+                for each(var action:Object in obj["path"]["actions"])
+                {
+                    actions.push(new PathAction(action["x"], action["y"], action["action"]));                    
+                }
+                var path:Path = new Path();
+                path.actions = actions;
+                path.frameDelay = obj["path"]["frameDelay"];
+                mesh.path = path;
+            }
+            
+            return mesh;
+        }
+        
+        //helper method, just gives shortcuts for primitive colors
+        public static function colorFromC(c:String):uint
+        {
+            //default color
+            if(c == null) return 0x0000ff;
+            
+            switch(c){
+                case "g":
+                    return 0x00ff00;
+                    break;
+                case "b":
+                    return 0x0000ff;
+                    break;
+                case "r":
+                    return 0xff0000;
+                    break;   
+            }
+            return 0xffffff;
+        }
+        
+        //clones a mesh--useful for keeping one archetypical player mesh around and cloning it for each level
+        public static function fromMesh(mesh:Mesh):Mesh
+        {
+            var ret:Mesh = new Mesh();
+            for each(var pixelSlot:PixelSlot in mesh.pixelSlots)
+            {
+                ret.addSlot(new PixelSlot(pixelSlot.px, pixelSlot.py, pixelSlot.color, pixelSlot.pixel != null));
+            }
+            
+            ret.hasBrain = mesh.hasBrain;
+            ret.hasRegen = mesh.hasRegen;
+            
+            return ret;
+        }
+        
         //traverses all PixelSlots and makes sure they're connected to the brain
         public function validate():void
         {
@@ -159,20 +255,6 @@ package com.mesh
                 }
             }
             return orphans;
-        }
-        
-        public static function fromMesh(mesh:Mesh):Mesh
-        {
-            var ret:Mesh = new Mesh();
-            for each(var pixelSlot:PixelSlot in mesh.pixelSlots)
-            {
-                ret.addSlot(new PixelSlot(pixelSlot.px, pixelSlot.py, pixelSlot.color, pixelSlot.pixel != null));
-            }
-            
-            ret.hasBrain = mesh.hasBrain;
-            ret.hasRegen = mesh.hasRegen;
-            
-            return ret;
         }
         
         public function clear():void

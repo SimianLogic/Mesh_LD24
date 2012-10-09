@@ -6,6 +6,7 @@ package
 	import com.mesh.MeshEditor;
 	import com.mesh.MeshLevel;
 	import com.mesh.PixelSlot;
+	import com.simianlogic.managers.DataManager;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -13,6 +14,10 @@ package
 	[SWF(width='640', height='480', backgroundColor='0xffffff', frameRate='30')]
 	public class MeshGame extends Sprite
 	{
+        public static var SHARED_OBJECT_KEY:String = "mesh_so";
+        public static var DEFAULT_DATA_KEYS:Array = ["player"];
+        public static var DEFAULT_DATA_VALUES:Array = [{"specials":["regen"],"slots":[{"x":0,"y":0,"c":"g"},{"x":0,"y":1},{"x":1,"y":0},{"x":-1,"y":0},{"x":0,"y":-1}]}];
+        
 		public var frame:int = 0;
         public var frameDelay:int = 4;
         
@@ -49,16 +54,13 @@ package
             Controller.registerAction("esc", 27);
             Controller.registerAction("upgrade", 85);
             
-            upgradePlayer = new Mesh();
-            upgradePlayer.hasRegen = true;
-            upgradePlayer.addSlot(new PixelSlot(0, 0, 0x00ff00, true));
-            upgradePlayer.addSlot(new PixelSlot(0, 1, 0x0000ff, true));
-            upgradePlayer.addSlot(new PixelSlot(1, 0, 0x0000ff, true));
-            upgradePlayer.addSlot(new PixelSlot(0, -1, 0x0000ff, true));
-            upgradePlayer.addSlot(new PixelSlot(-1, 0, 0x0000ff, true));
+            var dm:DataManager = DataManager.getInstance(SHARED_OBJECT_KEY, DEFAULT_DATA_KEYS, DEFAULT_DATA_VALUES);
+            
+            var playerObject:Object = DataManager.getStat("player");
+            upgradePlayer = Mesh.fromObject(playerObject);
             
             showMenu();
-            
+
             this.addEventListener(Event.ENTER_FRAME, update);		
 		}
         
