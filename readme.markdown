@@ -5,17 +5,15 @@ MAYBE TODOs
 
 MAJOR TODOs
 ===============
-* proper state/screen manager (sometimes losing reference to intro popup, which breaks the game)
-* player pixel budgets (remove pixel to get one back)
-* store pixelType on PixelSlot (brain, mover, armored, etc...)
-* edit colors in the mesh editor
+* buff out editor for creating levels
 * path editor for motion/AI meshes
 * submesh support
-* don't allow player to save mesh unless it's valid
 
 
 MINOR TODOs
 ===============
+* edit colors in the mesh editor
+* store pixelType on PixelSlot (brain, mover, armored, etc...)
 
 BUGS
 ===============
