@@ -84,47 +84,52 @@ package com.mesh
             var ret:Array = [];
             for each(var obj:Object in meshObject)
             {
-                var mesh:Mesh = new Mesh();
-                if(obj["x"]) mesh.px = obj["x"];
-                if(obj["y"]) mesh.py = obj["y"];
-                
-                //special property processing
-                //zombie => hasBrain:false
-                //regen => hasRegen:true
-                if(obj.hasOwnProperty("specials"))
-                {
-                 if(obj["specials"].indexOf("zombie") >= 0) mesh.hasBrain = false;
-                 if(obj["specials"].indexOf("regen") >= 0)  mesh.hasRegen = true;
-                }
-                
-                for each(var slot:Object in obj["slots"])
-                {
-                    //default value is filled:true
-                    var f:Boolean = true;
-                    if(slot.hasOwnProperty("filled"))
-                    {
-                        f = Boolean(slot["filled"]);
-                    }
-                    mesh.addSlot(new PixelSlot(slot["x"], slot["y"], colorFromC(slot["c"]), f));
-                }
-                
-                if(obj.hasOwnProperty("path"))
-                {
-                    var actions:Array = [];
-                    for each(var action:Object in obj["path"]["actions"])
-                    {
-                        actions.push(new PathAction(action["x"], action["y"], action["action"]));                    
-                    }
-                    var path:Path = new Path();
-                    path.actions = actions;
-                    path.frameDelay = obj["path"]["frameDelay"];
-                    mesh.path = path;
-                }
-                 
-                ret.push(mesh);
+                ret.push(objectToMesh(obj));
             }
             
             return ret;
+        }
+        
+        public static function objectToMesh(obj:Object):Mesh
+        {
+            var mesh:Mesh = new Mesh();
+            if(obj["x"]) mesh.px = obj["x"];
+            if(obj["y"]) mesh.py = obj["y"];
+            
+            //special property processing
+            //zombie => hasBrain:false
+            //regen => hasRegen:true
+            if(obj.hasOwnProperty("specials"))
+            {
+                if(obj["specials"].indexOf("zombie") >= 0) mesh.hasBrain = false;
+                if(obj["specials"].indexOf("regen") >= 0)  mesh.hasRegen = true;
+            }
+            
+            for each(var slot:Object in obj["slots"])
+            {
+                //default value is filled:true
+                var f:Boolean = true;
+                if(slot.hasOwnProperty("filled"))
+                {
+                    f = Boolean(slot["filled"]);
+                }
+                mesh.addSlot(new PixelSlot(slot["x"], slot["y"], colorFromC(slot["c"]), f));
+            }
+            
+            if(obj.hasOwnProperty("path"))
+            {
+                var actions:Array = [];
+                for each(var action:Object in obj["path"]["actions"])
+                {
+                    actions.push(new PathAction(action["x"], action["y"], action["action"]));                    
+                }
+                var path:Path = new Path();
+                path.actions = actions;
+                path.frameDelay = obj["path"]["frameDelay"];
+                mesh.path = path;
+            }
+            
+            return mesh;
         }
         
         public static function colorFromC(c:String):uint
