@@ -115,6 +115,45 @@ package com.mesh
             return mesh;
         }
         
+        public function toObject():Object
+        {
+            var obj:Object = new Object();
+            obj["x"] = px;
+            obj["y"] = py;
+            
+            var specials:Array = [];
+            if(!hasBrain) specials.push("zombie");
+            if(hasRegen) specials.push("regen");
+            if(specials.length > 0) obj["specials"] = specials;
+            
+            var slots:Array = [];
+            for each(var pixelSlot:PixelSlot in pixelSlots)
+            {
+                var ps:Object = new Object();
+                ps["x"] = pixelSlot.px;
+                ps["y"] = pixelSlot.py;
+                if(pixelSlot.color != 0x0000ff) ps["c"] = cFromColor(pixelSlot.color);
+                slots.push(ps);
+            }
+            obj["slots"] = slots;
+            
+            if(path)
+            {
+                var paths:Array = [];
+                for each(var pathAction:PathAction in path.actions)
+                {
+                    var a:Object = new Object();
+                    a["x"] = pathAction.px;
+                    a["y"] = pathAction.py;
+                    if(pathAction.action != "move") a["action"] = pathAction.action;
+                    paths.push(a);
+                }
+                obj["actions"] = [];
+            }
+            
+            return obj;
+        }
+        
         //helper method, just gives shortcuts for primitive colors
         public static function colorFromC(c:String):uint
         {
@@ -134,6 +173,25 @@ package com.mesh
             }
             return 0xffffff;
         }
+        public static function cFromColor(color:uint):String
+        {
+            switch(color){
+                case 0x00ff00:
+                    return 'g';
+                    break;
+                case 0xff0000:
+                    return 'r';
+                    break;
+                case 0x0000ff:
+                    return 'b';
+                    break;
+                default:
+                    return 'b';
+            }
+            
+            return 'b';
+        }
+        
         
         //clones a mesh--useful for keeping one archetypical player mesh around and cloning it for each level
         public static function fromMesh(mesh:Mesh):Mesh
@@ -141,7 +199,7 @@ package com.mesh
             var ret:Mesh = new Mesh();
             for each(var pixelSlot:PixelSlot in mesh.pixelSlots)
             {
-                ret.addSlot(new PixelSlot(pixelSlot.px, pixelSlot.py, pixelSlot.color, pixelSlot.pixel != null));
+                ret.addSlot(new PixelSlot(pixelSlot.px, pixelSlot.py, pixelSlot.color, (pixelSlot.valid && pixelSlot.pixel != null)));
             }
             
             ret.hasBrain = mesh.hasBrain;
@@ -269,7 +327,6 @@ package com.mesh
         {
             if(keepers == -1) keepers = pixelSlots.length;
             
-            trace("RESET!");
             markedForDeath = false;
             var i:int = 0;
             for each(var pixelSlot:PixelSlot in pixelSlots)
@@ -573,7 +630,7 @@ package com.mesh
             bottom = 0;
             for each(var ps:PixelSlot in pixelSlots)
             {
-                if(ps.pixel == null) continue;
+                if(ps.pixel == null || !ps.valid) continue;
                 
                 left = Math.min(ps.px, left);
                 right = Math.max(ps.px, right);
@@ -596,6 +653,8 @@ package com.mesh
             slotBottom = 0;
             for each(var ps:PixelSlot in pixelSlots)
             {
+                if(!ps.valid) continue;
+                
                 slotLeft = Math.min(ps.px, slotLeft);
                 slotRight = Math.max(ps.px, slotRight);
                 slotTop = Math.min(ps.py, slotTop);

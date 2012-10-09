@@ -115,7 +115,6 @@ package com.mesh
             //see if the player will fit, otherwise upgrade to the next size
             while(player.bottom + level.startY >= size.pixelHeight)
             {
-                trace("UPGRADE");
                 size = ArenaSize.nextSize(size);
                 
                 //a little wasteful to do this every time, but we don't even need it most of the time

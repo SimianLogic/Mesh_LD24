@@ -58,6 +58,7 @@ package
             
             var playerObject:Object = DataManager.getStat("player");
             upgradePlayer = Mesh.fromObject(playerObject);
+            upgradePlayer.validate();
             
             showMenu();
 
@@ -165,11 +166,16 @@ package
             var input:Array = Controller.getUpdates();
             if(input[0].indexOf("esc") >= 0)
             {
-                if(contains(upgradeArena))
-                {
-                    removeChild(upgradeArena);
-                    showMenu();
-                }
+                if(contains(upgradeArena)) removeChild(upgradeArena);
+                
+                showMenu();
+                
+                var toSave:Object = upgradePlayer.toObject();
+                //no need for x/y coordinates
+                delete toSave["x"];
+                delete toSave["y"];
+                trace(toSave);
+                DataManager.setStat("player",toSave);
             }
             
             upgradeArena.update();
